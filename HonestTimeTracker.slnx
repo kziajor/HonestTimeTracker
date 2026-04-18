@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/HonestTimeTracker.Application/HonestTimeTracker.Application.csproj" />
+    <Project Path="src/HonestTimeTracker.Desktop/HonestTimeTracker.Desktop.csproj" />
+    <Project Path="src/HonestTimeTracker.Domain/HonestTimeTracker.Domain.csproj" />
+    <Project Path="src/HonestTimeTracker.Infrastructure/HonestTimeTracker.Infrastructure.csproj" />
+  </Folder>
+</Solution>

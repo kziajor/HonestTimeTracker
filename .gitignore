@@ -1,0 +1,19 @@
+## Build outputs
+bin/
+obj/
+
+## Publish output
+Publish/
+
+## EF Core design-time DB
+*.db
+*.db-shm
+*.db-wal
+
+## Rider / VS
+.idea/
+.vs/
+*.user
+
+## Logs
+*.log
