@@ -19,7 +19,7 @@ public partial class TasksPage : UserControl
 
     private void UpdateTitleColumnWidth()
     {
-        const double fixedWidth = 160 + 90 + 120 + 110 + 110; // Projekt + Plan + Spędzony + Status + Akcje
+        const double fixedWidth = 160 + 90 + 120 + 110 + 140; // Projekt + Plan + Spędzony + Status + Akcje
         var available = TaskListView.ActualWidth - fixedWidth - 26;
         if (available > 80)
             TitleColumn.Width = available;

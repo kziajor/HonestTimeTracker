@@ -37,13 +37,16 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IValidator<UpdateTaskCommand>, UpdateTaskCommandValidator>();
         services.AddScoped<IValidator<DeleteTaskCommand>, DeleteTaskCommandValidator>();
         services.AddScoped<IValidator<ToggleTaskClosedCommand>, ToggleTaskClosedCommandValidator>();
+        services.AddScoped<IValidator<SetTodayListCommand>, SetTodayListCommandValidator>();
 
         services.AddCommandHandler<CreateTaskCommand, CreateTaskCommandHandler, int>();
         services.AddCommandHandler<UpdateTaskCommand, UpdateTaskCommandHandler, Unit>();
         services.AddCommandHandler<DeleteTaskCommand, DeleteTaskCommandHandler, Unit>();
         services.AddCommandHandler<ToggleTaskClosedCommand, ToggleTaskClosedCommandHandler, Unit>();
+        services.AddCommandHandler<SetTodayListCommand, SetTodayListCommandHandler, Unit>();
 
         services.AddScoped<IQueryHandler<GetTasksQuery, List<TaskDto>>, GetTasksQueryHandler>();
+        services.AddScoped<IQueryHandler<GetTodayTasksQuery, List<TaskDto>>, GetTodayTasksQueryHandler>();
 
         services.AddScoped<IValidator<CreateRecordCommand>, CreateRecordCommandValidator>();
         services.AddScoped<IValidator<UpdateRecordCommand>, UpdateRecordCommandValidator>();

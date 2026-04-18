@@ -18,6 +18,12 @@ public class TaskRepository(AppDbContext db) : ITaskRepository
         return query.OrderBy(t => t.Title).ToListAsync(ct);
     }
 
+    public Task<List<WorkTask>> GetTodayAsync(CancellationToken ct) =>
+        db.Tasks.Include(t => t.Project)
+            .Where(t => t.IsOnTodayList)
+            .OrderBy(t => t.Title)
+            .ToListAsync(ct);
+
     public Task<WorkTask?> GetByIdAsync(int id, CancellationToken ct) =>
         db.Tasks.FirstOrDefaultAsync(t => t.Id == id, ct);
 

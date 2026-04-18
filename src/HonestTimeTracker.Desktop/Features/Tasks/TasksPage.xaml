@@ -118,7 +118,7 @@
                         </GridViewColumn>
 
                         <!-- Actions -->
-                        <GridViewColumn Header="Actions" Width="110">
+                        <GridViewColumn Header="Actions" Width="140">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
@@ -198,6 +198,27 @@
                                                 Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}">
                                             <Button.ContextMenu>
                                                 <ContextMenu>
+                                                    <MenuItem Command="{Binding PlacementTarget.Tag.ToggleTodayListCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                                        <MenuItem.Style>
+                                                            <Style TargetType="MenuItem">
+                                                                <Setter Property="Header" Value="Add to Today" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding PlacementTarget.DataContext.IsOnTodayList, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Value="True">
+                                                                        <Setter Property="Header" Value="Remove from Today" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </MenuItem.Style>
+                                                        <MenuItem.Icon>
+                                                            <Viewbox Width="14" Height="14">
+                                                                <Canvas Width="24" Height="24">
+                                                                    <Path Stroke="#A0522D" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"
+                                                                          Data="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+                                                                </Canvas>
+                                                            </Viewbox>
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
                                                     <MenuItem Header="Edit"
                                                               Command="{Binding PlacementTarget.Tag.EditCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                                                               CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">

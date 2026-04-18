@@ -27,6 +27,7 @@ public class TasksViewModel : ViewModelBase
     public ICommand EditCommand { get; }
     public ICommand DeleteCommand { get; }
     public ICommand ToggleClosedCommand { get; }
+    public ICommand ToggleTodayListCommand { get; }
     public ICommand StartTimerCommand { get; }
     public ICommand StopTimerCommand { get; }
 
@@ -37,6 +38,7 @@ public class TasksViewModel : ViewModelBase
         EditCommand = new AsyncRelayCommand(p => EditAsync((TaskDto)p!), p => p is TaskDto);
         DeleteCommand = new AsyncRelayCommand(p => DeleteAsync((TaskDto)p!), p => p is TaskDto);
         ToggleClosedCommand = new AsyncRelayCommand(p => ToggleClosedAsync((TaskDto)p!), p => p is TaskDto);
+        ToggleTodayListCommand = new AsyncRelayCommand(p => ToggleTodayListAsync((TaskDto)p!), p => p is TaskDto);
         StartTimerCommand = new AsyncRelayCommand(p => StartTimerAsync((TaskDto)p!), p => p is TaskDto);
         StopTimerCommand = new AsyncRelayCommand(p => StopTimerAsync((TaskDto)p!), p => p is TaskDto);
     }
@@ -128,6 +130,21 @@ public class TasksViewModel : ViewModelBase
         try
         {
             await handler.HandleAsync(new ToggleTaskClosedCommand(task.Id));
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private async Task ToggleTodayListAsync(TaskDto task)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var handler = scope.ServiceProvider.GetRequiredService<ICommandHandler<SetTodayListCommand, Unit>>();
+        try
+        {
+            await handler.HandleAsync(new SetTodayListCommand(task.Id, !task.IsOnTodayList));
             await LoadAsync();
         }
         catch (Exception ex)

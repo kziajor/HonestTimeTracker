@@ -1,6 +1,7 @@
 using HonestTimeTracker.Desktop.Features.Projects;
 using HonestTimeTracker.Desktop.Features.Records;
 using HonestTimeTracker.Desktop.Features.Tasks;
+using HonestTimeTracker.Desktop.Features.Today;
 using HonestTimeTracker.Infrastructure;
 using HonestTimeTracker.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -30,11 +31,12 @@ public partial class App : System.Windows.Application
         services.AddTransient<TasksPage>();
         services.AddTransient<RecordsViewModel>();
         services.AddTransient<RecordsPage>();
+        services.AddTransient<TodayViewModel>();
+        services.AddTransient<TodayPage>();
 
         Services = services.BuildServiceProvider();
 
         await MigrateDatabase();
-        await HandleOpenRecords();
 
         Services.GetRequiredService<MainWindow>().Show();
     }
@@ -62,42 +64,5 @@ public partial class App : System.Windows.Application
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         await db.Database.MigrateAsync();
-    }
-
-    private static async Task HandleOpenRecords()
-    {
-        using var scope = Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-        var openRecords = await db.Records
-            .Where(r => r.FinishedAt == null)
-            .ToListAsync();
-
-        if (openRecords.Count == 0) return;
-
-        var result = MessageBox.Show(
-            $"Found {openRecords.Count} unfinished work record(s) — the application may have closed unexpectedly.\n\n" +
-            "Yes — finish records now (FinishedAt = now)\n" +
-            "No — delete records",
-            "Unfinished records",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Warning);
-
-        if (result == MessageBoxResult.Yes)
-        {
-            var now = DateTime.Now;
-            foreach (var record in openRecords)
-            {
-                record.FinishedAt = now;
-                record.MinutesSpent = (int)(now - record.StartedAt).TotalMinutes;
-            }
-        }
-        else
-        {
-            foreach (var record in openRecords)
-                record.IsDeleted = true;
-        }
-
-        await db.SaveChangesAsync();
     }
 }
