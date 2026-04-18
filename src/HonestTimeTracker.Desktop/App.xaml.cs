@@ -1,4 +1,5 @@
 using HonestTimeTracker.Desktop.Features.Projects;
+using HonestTimeTracker.Desktop.Features.Records;
 using HonestTimeTracker.Desktop.Features.Tasks;
 using HonestTimeTracker.Infrastructure;
 using HonestTimeTracker.Infrastructure.Persistence;
@@ -27,6 +28,8 @@ public partial class App : System.Windows.Application
         services.AddTransient<ProjectsPage>();
         services.AddTransient<TasksViewModel>();
         services.AddTransient<TasksPage>();
+        services.AddTransient<RecordsViewModel>();
+        services.AddTransient<RecordsPage>();
 
         Services = services.BuildServiceProvider();
 
@@ -91,7 +94,8 @@ public partial class App : System.Windows.Application
         }
         else
         {
-            db.Records.RemoveRange(openRecords);
+            foreach (var record in openRecords)
+                record.IsDeleted = true;
         }
 
         await db.SaveChangesAsync();

@@ -25,7 +25,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasOne(r => r.Task)
             .WithMany(t => t.Records)
             .HasForeignKey(r => r.TaskId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<WorkTask>()
             .HasOne(t => t.Project)

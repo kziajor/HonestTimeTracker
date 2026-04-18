@@ -5,6 +5,7 @@
     <!-- Converters -->
     <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
     <common:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
+    <common:DateOnlyConverter x:Key="DateOnlyConverter" />
 
     <!-- Honest IT Brand Colors -->
     <Color x:Key="PrimaryColor">#FFFBCB18</Color>

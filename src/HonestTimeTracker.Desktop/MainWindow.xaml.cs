@@ -1,4 +1,5 @@
 using HonestTimeTracker.Desktop.Features.Projects;
+using HonestTimeTracker.Desktop.Features.Records;
 using HonestTimeTracker.Desktop.Features.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
@@ -34,6 +35,12 @@ public partial class MainWindow : Window
                 var tasksPage = App.Services.GetRequiredService<TasksPage>();
                 MainContent.Content = tasksPage;
                 await tasksPage.InitializeAsync();
+                break;
+
+            case "Records":
+                var recordsPage = App.Services.GetRequiredService<RecordsPage>();
+                MainContent.Content = recordsPage;
+                await recordsPage.InitializeAsync();
                 break;
 
             default:

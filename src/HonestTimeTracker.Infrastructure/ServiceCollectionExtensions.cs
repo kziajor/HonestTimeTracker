@@ -1,6 +1,7 @@
 using FluentValidation;
 using HonestTimeTracker.Application;
 using HonestTimeTracker.Application.Projects;
+using HonestTimeTracker.Application.Records;
 using HonestTimeTracker.Application.Tasks;
 using HonestTimeTracker.Infrastructure.Persistence;
 using HonestTimeTracker.Infrastructure.Repositories;
@@ -18,6 +19,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IProjectRepository, ProjectRepository>();
         services.AddScoped<ITaskRepository, TaskRepository>();
+        services.AddScoped<IRecordRepository, RecordRepository>();
 
         services.AddScoped<IValidator<CreateProjectCommand>, CreateProjectCommandValidator>();
         services.AddScoped<IValidator<UpdateProjectCommand>, UpdateProjectCommandValidator>();
@@ -42,6 +44,16 @@ public static class ServiceCollectionExtensions
         services.AddCommandHandler<ToggleTaskClosedCommand, ToggleTaskClosedCommandHandler, Unit>();
 
         services.AddScoped<IQueryHandler<GetTasksQuery, List<TaskDto>>, GetTasksQueryHandler>();
+
+        services.AddScoped<IValidator<CreateRecordCommand>, CreateRecordCommandValidator>();
+        services.AddScoped<IValidator<UpdateRecordCommand>, UpdateRecordCommandValidator>();
+        services.AddScoped<IValidator<DeleteRecordCommand>, DeleteRecordCommandValidator>();
+
+        services.AddCommandHandler<CreateRecordCommand, CreateRecordCommandHandler, int>();
+        services.AddCommandHandler<UpdateRecordCommand, UpdateRecordCommandHandler, Unit>();
+        services.AddCommandHandler<DeleteRecordCommand, DeleteRecordCommandHandler, Unit>();
+
+        services.AddScoped<IQueryHandler<GetRecordsQuery, List<RecordDto>>, GetRecordsQueryHandler>();
 
         return services;
     }
