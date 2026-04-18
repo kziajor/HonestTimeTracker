@@ -2,6 +2,7 @@ using FluentValidation;
 using HonestTimeTracker.Application;
 using HonestTimeTracker.Application.Projects;
 using HonestTimeTracker.Application.Records;
+using HonestTimeTracker.Application.Settings;
 using HonestTimeTracker.Application.Tasks;
 using HonestTimeTracker.Infrastructure.Persistence;
 using HonestTimeTracker.Infrastructure.Repositories;
@@ -17,6 +18,7 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<AppDbContext>(opt =>
             opt.UseSqlite($"Data Source={dbPath}"));
 
+        services.AddScoped<ISettingsRepository, SettingsRepository>();
         services.AddScoped<IProjectRepository, ProjectRepository>();
         services.AddScoped<ITaskRepository, TaskRepository>();
         services.AddScoped<IRecordRepository, RecordRepository>();
@@ -61,6 +63,10 @@ public static class ServiceCollectionExtensions
         services.AddCommandHandler<StopTimerCommand, StopTimerCommandHandler, Unit>();
 
         services.AddScoped<IQueryHandler<GetRecordsQuery, List<RecordDto>>, GetRecordsQueryHandler>();
+
+        services.AddScoped<IValidator<UpdateSettingsCommand>, UpdateSettingsCommandValidator>();
+        services.AddCommandHandler<UpdateSettingsCommand, UpdateSettingsCommandHandler, Unit>();
+        services.AddScoped<IQueryHandler<GetSettingsQuery, SettingsDto>, GetSettingsQueryHandler>();
 
         return services;
     }

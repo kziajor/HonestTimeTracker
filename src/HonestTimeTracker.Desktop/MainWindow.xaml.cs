@@ -1,5 +1,6 @@
 using HonestTimeTracker.Desktop.Features.Projects;
 using HonestTimeTracker.Desktop.Features.Records;
+using HonestTimeTracker.Desktop.Features.Settings;
 using HonestTimeTracker.Desktop.Features.Tasks;
 using HonestTimeTracker.Desktop.Features.Today;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,6 +49,12 @@ public partial class MainWindow : Window
                 var todayPage = App.Services.GetRequiredService<TodayPage>();
                 MainContent.Content = todayPage;
                 await todayPage.InitializeAsync();
+                break;
+
+            case "Settings":
+                var settingsPage = App.Services.GetRequiredService<SettingsPage>();
+                MainContent.Content = settingsPage;
+                await settingsPage.InitializeAsync();
                 break;
 
             default:

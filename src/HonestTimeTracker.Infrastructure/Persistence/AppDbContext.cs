@@ -40,6 +40,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<AppSettings>().HasData(
-            new AppSettings { Id = 1, DbFilePath = string.Empty, DailyWorkHours = 8.0 });
+            new AppSettings { Id = 1, DbFilePath = string.Empty, DailyWorkHours = 8.0, DefaultTaskPlannedHours = null });
     }
 }

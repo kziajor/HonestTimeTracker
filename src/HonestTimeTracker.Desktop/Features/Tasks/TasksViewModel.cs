@@ -1,6 +1,7 @@
 using HonestTimeTracker.Application;
 using HonestTimeTracker.Application.Projects;
 using HonestTimeTracker.Application.Records;
+using HonestTimeTracker.Application.Settings;
 using HonestTimeTracker.Application.Tasks;
 using HonestTimeTracker.Desktop.Common;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,10 +60,19 @@ public class TasksViewModel : ViewModelBase
         return await handler.HandleAsync(new GetProjectsQuery(ShowClosed: false));
     }
 
+    private async Task<double?> GetDefaultTaskPlannedHoursAsync()
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var handler = scope.ServiceProvider.GetRequiredService<IQueryHandler<GetSettingsQuery, SettingsDto>>();
+        var settings = await handler.HandleAsync(new GetSettingsQuery());
+        return settings.DefaultTaskPlannedHours;
+    }
+
     private async Task AddAsync()
     {
         var projects = await GetProjectsAsync();
-        var dialog = new TaskDialog(projects) { Owner = System.Windows.Application.Current.MainWindow };
+        var defaultHours = await GetDefaultTaskPlannedHoursAsync();
+        var dialog = new TaskDialog(projects, defaultPlannedHours: defaultHours) { Owner = System.Windows.Application.Current.MainWindow };
         if (dialog.ShowDialog() != true) return;
 
         using var scope = _scopeFactory.CreateScope();

@@ -10,7 +10,7 @@ public partial class TaskDialog : Window
     public int PlannedMinutes { get; private set; }
     public int ProjectId => ((ProjectDto)ProjectComboBox.SelectedItem).Id;
 
-    public TaskDialog(IEnumerable<ProjectDto> projects, string? existingTitle = null, int existingPlannedMinutes = 0, int? existingProjectId = null)
+    public TaskDialog(IEnumerable<ProjectDto> projects, string? existingTitle = null, int existingPlannedMinutes = 0, int? existingProjectId = null, double? defaultPlannedHours = null)
     {
         InitializeComponent();
 
@@ -26,6 +26,10 @@ public partial class TaskDialog : Window
             TitleBox.Text = existingTitle;
             PlannedHoursBox.Text = (existingPlannedMinutes / 60.0).ToString("F2", System.Globalization.CultureInfo.CurrentCulture);
             OkButton.Content = "Save changes";
+        }
+        else if (defaultPlannedHours.HasValue)
+        {
+            PlannedHoursBox.Text = defaultPlannedHours.Value.ToString(System.Globalization.CultureInfo.CurrentCulture);
         }
 
         Loaded += (_, _) =>

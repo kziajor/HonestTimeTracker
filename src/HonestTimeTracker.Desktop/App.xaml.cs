@@ -1,5 +1,6 @@
 using HonestTimeTracker.Desktop.Features.Projects;
 using HonestTimeTracker.Desktop.Features.Records;
+using HonestTimeTracker.Desktop.Features.Settings;
 using HonestTimeTracker.Desktop.Features.Tasks;
 using HonestTimeTracker.Desktop.Features.Today;
 using HonestTimeTracker.Infrastructure;
@@ -33,6 +34,8 @@ public partial class App : System.Windows.Application
         services.AddTransient<RecordsPage>();
         services.AddTransient<TodayViewModel>();
         services.AddTransient<TodayPage>();
+        services.AddTransient<SettingsViewModel>();
+        services.AddTransient<SettingsPage>();
 
         Services = services.BuildServiceProvider();
 
