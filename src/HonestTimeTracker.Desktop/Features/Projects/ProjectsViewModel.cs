@@ -11,14 +11,14 @@ namespace HonestTimeTracker.Desktop.Features.Projects;
 public class ProjectsViewModel : ViewModelBase
 {
     private readonly IServiceScopeFactory _scopeFactory;
-    private bool _includeClosed = true;
+    private bool _showClosed = false;
 
     public ObservableCollection<ProjectDto> Projects { get; } = [];
 
-    public bool IncludeClosed
+    public bool ShowClosed
     {
-        get => _includeClosed;
-        set { if (Set(ref _includeClosed, value)) _ = LoadAsync(); }
+        get => _showClosed;
+        set { if (Set(ref _showClosed, value)) _ = LoadAsync(); }
     }
 
     public ICommand AddCommand { get; }
@@ -39,14 +39,14 @@ public class ProjectsViewModel : ViewModelBase
     {
         using var scope = _scopeFactory.CreateScope();
         var handler = scope.ServiceProvider.GetRequiredService<IQueryHandler<GetProjectsQuery, List<ProjectDto>>>();
-        var projects = await handler.HandleAsync(new GetProjectsQuery(IncludeClosed));
+        var projects = await handler.HandleAsync(new GetProjectsQuery(ShowClosed));
         Projects.Clear();
         foreach (var p in projects) Projects.Add(p);
     }
 
     private async Task AddAsync()
     {
-        var dialog = new ProjectDialog();
+        var dialog = new ProjectDialog { Owner = System.Windows.Application.Current.MainWindow };
         if (dialog.ShowDialog() != true) return;
 
         using var scope = _scopeFactory.CreateScope();
@@ -58,13 +58,13 @@ public class ProjectsViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 
     private async Task EditAsync(ProjectDto project)
     {
-        var dialog = new ProjectDialog(project.Name);
+        var dialog = new ProjectDialog(project.Name) { Owner = System.Windows.Application.Current.MainWindow };
         if (dialog.ShowDialog() != true) return;
 
         using var scope = _scopeFactory.CreateScope();
@@ -76,15 +76,15 @@ public class ProjectsViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 
     private async Task DeleteAsync(ProjectDto project)
     {
         var confirm = MessageBox.Show(
-            $"Czy na pewno chcesz usunąć projekt \"{project.Name}\"?\nOperacja jest nieodwracalna.",
-            "Usuń projekt",
+            $"Are you sure you want to delete project \"{project.Name}\"?\nThis action cannot be undone.",
+            "Delete project",
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
 
@@ -99,7 +99,7 @@ public class ProjectsViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 
@@ -114,7 +114,7 @@ public class ProjectsViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 }

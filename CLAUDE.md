@@ -4,6 +4,10 @@
 
 Desktopowa aplikacja .NET do śledzenia czasu pracy nad zadaniami, wzorowana na konsolowej wersji z katalogu `../ConsoleTimeTracker`. Docelowo zintegrowana z TFS (self-hosted / Azure DevOps Server).
 
+## Język interfejsu
+
+Cały interfejs użytkownika (UI) jest w języku **angielskim** — wszystkie etykiety, nagłówki, przyciski, komunikaty błędów i okna dialogowe.
+
 ## Stack technologiczny
 
 - **Platforma:** .NET 10 — aplikacja desktopowa WPF

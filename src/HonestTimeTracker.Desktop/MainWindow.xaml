@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Honest Time Tracker"
-        Height="680" Width="1100"
+        Height="680" Width="1200"
         MinHeight="480" MinWidth="800"
         WindowStartupLocation="CenterScreen">
 
@@ -32,11 +32,12 @@
 
                 <!-- Navigation -->
                 <StackPanel DockPanel.Dock="Top" Margin="0,8,0,0">
-                    <Button Style="{StaticResource NavButton}" Content="Dziś"       Tag="Today"    Click="NavButton_Click" />
-                    <Button Style="{StaticResource NavButton}" Content="Projekty"   Tag="Projects" Click="NavButton_Click" />
-                    <Button Style="{StaticResource NavButton}" Content="Rekordy"    Tag="Records"  Click="NavButton_Click" />
-                    <Button Style="{StaticResource NavButton}" Content="Raporty"    Tag="Reports"  Click="NavButton_Click" />
-                    <Button Style="{StaticResource NavButton}" Content="Ustawienia" Tag="Settings" Click="NavButton_Click" />
+                    <Button Style="{StaticResource NavButton}" Content="Today"    Tag="Today"    Click="NavButton_Click" />
+                    <Button Style="{StaticResource NavButton}" Content="Projects" Tag="Projects" Click="NavButton_Click" />
+                    <Button Style="{StaticResource NavButton}" Content="Tasks"    Tag="Tasks"    Click="NavButton_Click" />
+                    <Button Style="{StaticResource NavButton}" Content="Records"  Tag="Records"  Click="NavButton_Click" />
+                    <Button Style="{StaticResource NavButton}" Content="Reports"  Tag="Reports"  Click="NavButton_Click" />
+                    <Button Style="{StaticResource NavButton}" Content="Settings" Tag="Settings" Click="NavButton_Click" />
                 </StackPanel>
             </DockPanel>
         </Border>

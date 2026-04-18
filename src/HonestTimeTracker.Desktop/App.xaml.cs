@@ -1,4 +1,5 @@
 using HonestTimeTracker.Desktop.Features.Projects;
+using HonestTimeTracker.Desktop.Features.Tasks;
 using HonestTimeTracker.Infrastructure;
 using HonestTimeTracker.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,8 @@ public partial class App : System.Windows.Application
         services.AddSingleton<MainWindow>();
         services.AddTransient<ProjectsViewModel>();
         services.AddTransient<ProjectsPage>();
+        services.AddTransient<TasksViewModel>();
+        services.AddTransient<TasksPage>();
 
         Services = services.BuildServiceProvider();
 
@@ -70,10 +73,10 @@ public partial class App : System.Windows.Application
         if (openRecords.Count == 0) return;
 
         var result = MessageBox.Show(
-            $"Znaleziono {openRecords.Count} niezakończony/e rekord/y pracy (aplikacja mogła zakończyć się nieprawidłowo).\n\n" +
-            "Tak — zakończ rekordy teraz (FinishedAt = teraz)\n" +
-            "Nie — usuń rekordy",
-            "Niezakończone rekordy",
+            $"Found {openRecords.Count} unfinished work record(s) — the application may have closed unexpectedly.\n\n" +
+            "Yes — finish records now (FinishedAt = now)\n" +
+            "No — delete records",
+            "Unfinished records",
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
 

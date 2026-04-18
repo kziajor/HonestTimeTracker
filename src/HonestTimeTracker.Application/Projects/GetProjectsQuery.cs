@@ -1,3 +1,3 @@
 namespace HonestTimeTracker.Application.Projects;
 
-public record GetProjectsQuery(bool IncludeClosed = true) : IQuery<List<ProjectDto>>;
+public record GetProjectsQuery(bool ShowClosed = false) : IQuery<List<ProjectDto>>;

@@ -1,6 +1,7 @@
 using FluentValidation;
 using HonestTimeTracker.Application;
 using HonestTimeTracker.Application.Projects;
+using HonestTimeTracker.Application.Tasks;
 using HonestTimeTracker.Infrastructure.Persistence;
 using HonestTimeTracker.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ public static class ServiceCollectionExtensions
             opt.UseSqlite($"Data Source={dbPath}"));
 
         services.AddScoped<IProjectRepository, ProjectRepository>();
+        services.AddScoped<ITaskRepository, TaskRepository>();
 
         services.AddScoped<IValidator<CreateProjectCommand>, CreateProjectCommandValidator>();
         services.AddScoped<IValidator<UpdateProjectCommand>, UpdateProjectCommandValidator>();
@@ -28,6 +30,18 @@ public static class ServiceCollectionExtensions
         services.AddCommandHandler<ToggleProjectClosedCommand, ToggleProjectClosedCommandHandler, Unit>();
 
         services.AddScoped<IQueryHandler<GetProjectsQuery, List<ProjectDto>>, GetProjectsQueryHandler>();
+
+        services.AddScoped<IValidator<CreateTaskCommand>, CreateTaskCommandValidator>();
+        services.AddScoped<IValidator<UpdateTaskCommand>, UpdateTaskCommandValidator>();
+        services.AddScoped<IValidator<DeleteTaskCommand>, DeleteTaskCommandValidator>();
+        services.AddScoped<IValidator<ToggleTaskClosedCommand>, ToggleTaskClosedCommandValidator>();
+
+        services.AddCommandHandler<CreateTaskCommand, CreateTaskCommandHandler, int>();
+        services.AddCommandHandler<UpdateTaskCommand, UpdateTaskCommandHandler, Unit>();
+        services.AddCommandHandler<DeleteTaskCommand, DeleteTaskCommandHandler, Unit>();
+        services.AddCommandHandler<ToggleTaskClosedCommand, ToggleTaskClosedCommandHandler, Unit>();
+
+        services.AddScoped<IQueryHandler<GetTasksQuery, List<TaskDto>>, GetTasksQueryHandler>();
 
         return services;
     }

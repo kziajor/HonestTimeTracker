@@ -7,11 +7,12 @@ namespace HonestTimeTracker.Infrastructure.Repositories;
 
 public class ProjectRepository(AppDbContext db) : IProjectRepository
 {
-    public Task<List<Project>> GetAllAsync(bool includeClosed, CancellationToken ct)
+    public Task<List<Project>> GetAllAsync(bool showClosed, CancellationToken ct)
     {
         var query = db.Projects.AsQueryable();
-        if (!includeClosed)
-            query = query.Where(p => !p.Closed);
+        query = showClosed
+            ? query.Where(p => p.Closed)
+            : query.Where(p => !p.Closed);
         return query.OrderBy(p => p.Name).ToListAsync(ct);
     }
 

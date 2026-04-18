@@ -9,7 +9,7 @@ public class CreateProjectCommandValidator : AbstractValidator<CreateProjectComm
     public CreateProjectCommandValidator()
     {
         RuleFor(x => x.Name)
-            .NotEmpty().WithMessage("Nazwa projektu jest wymagana.")
-            .MaximumLength(200).WithMessage("Nazwa projektu nie może przekraczać 200 znaków.");
+            .NotEmpty().WithMessage("Project name is required.")
+            .MaximumLength(200).WithMessage("Project name cannot exceed 200 characters.");
     }
 }

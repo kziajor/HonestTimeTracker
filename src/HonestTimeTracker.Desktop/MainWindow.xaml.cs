@@ -1,4 +1,5 @@
 using HonestTimeTracker.Desktop.Features.Projects;
+using HonestTimeTracker.Desktop.Features.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,10 +30,16 @@ public partial class MainWindow : Window
                 await page.InitializeAsync();
                 break;
 
+            case "Tasks":
+                var tasksPage = App.Services.GetRequiredService<TasksPage>();
+                MainContent.Content = tasksPage;
+                await tasksPage.InitializeAsync();
+                break;
+
             default:
                 MainContent.Content = new TextBlock
                 {
-                    Text = "Sekcja w budowie.",
+                    Text = "Section under construction.",
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     FontSize = 16,

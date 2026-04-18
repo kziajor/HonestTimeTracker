@@ -13,9 +13,9 @@ public partial class ProjectDialog : Window
 
         if (existingName is not null)
         {
-            TitleText.Text = "Edytuj projekt";
+            TitleText.Text = "Edit project";
             NameBox.Text = existingName;
-            OkButton.Content = "Zapisz zmiany";
+            OkButton.Content = "Save changes";
         }
 
         Loaded += (_, _) =>
@@ -29,7 +29,7 @@ public partial class ProjectDialog : Window
     {
         if (string.IsNullOrWhiteSpace(ProjectName))
         {
-            MessageBox.Show("Nazwa projektu nie może być pusta.", "Walidacja",
+            MessageBox.Show("Project name cannot be empty.", "Validation",
                 MessageBoxButton.OK, MessageBoxImage.Warning);
             NameBox.Focus();
             return;
