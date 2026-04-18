@@ -10,4 +10,6 @@ public class WorkRecord
 
     public int TaskId { get; set; }
     public WorkTask Task { get; set; } = null!;
+
+    public bool IsDeleted { get; set; }
 }

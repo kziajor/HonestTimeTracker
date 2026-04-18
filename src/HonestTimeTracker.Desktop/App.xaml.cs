@@ -1,3 +1,4 @@
+using HonestTimeTracker.Desktop.Features.Projects;
 using HonestTimeTracker.Infrastructure;
 using HonestTimeTracker.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,8 @@ public partial class App : System.Windows.Application
         var services = new ServiceCollection();
         services.AddInfrastructure(dbPath);
         services.AddSingleton<MainWindow>();
+        services.AddTransient<ProjectsViewModel>();
+        services.AddTransient<ProjectsPage>();
 
         Services = services.BuildServiceProvider();
 

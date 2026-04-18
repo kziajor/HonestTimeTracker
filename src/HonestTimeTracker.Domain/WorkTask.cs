@@ -15,4 +15,6 @@ public class WorkTask
     public int? TfsWorkItemId { get; set; }
 
     public ICollection<WorkRecord> Records { get; set; } = new List<WorkRecord>();
+
+    public bool IsDeleted { get; set; }
 }

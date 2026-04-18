@@ -16,6 +16,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<WorkTask>().ToTable("Tasks");
         modelBuilder.Entity<WorkRecord>().ToTable("Records");
 
+        modelBuilder.Entity<Project>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<WorkTask>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<WorkRecord>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<TfsCollection>().HasQueryFilter(e => !e.IsDeleted);
+
         modelBuilder.Entity<WorkRecord>()
             .HasOne(r => r.Task)
             .WithMany(t => t.Records)

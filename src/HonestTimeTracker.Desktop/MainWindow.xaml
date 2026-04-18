@@ -32,10 +32,10 @@
 
                 <!-- Navigation -->
                 <StackPanel DockPanel.Dock="Top" Margin="0,8,0,0">
-                    <Button Style="{StaticResource NavButton}" Content="Dziś" Tag="Today" Click="NavButton_Click" />
-                    <Button Style="{StaticResource NavButton}" Content="Projekty" Tag="Projects" Click="NavButton_Click" />
-                    <Button Style="{StaticResource NavButton}" Content="Rekordy" Tag="Records" Click="NavButton_Click" />
-                    <Button Style="{StaticResource NavButton}" Content="Raporty" Tag="Reports" Click="NavButton_Click" />
+                    <Button Style="{StaticResource NavButton}" Content="Dziś"       Tag="Today"    Click="NavButton_Click" />
+                    <Button Style="{StaticResource NavButton}" Content="Projekty"   Tag="Projects" Click="NavButton_Click" />
+                    <Button Style="{StaticResource NavButton}" Content="Rekordy"    Tag="Records"  Click="NavButton_Click" />
+                    <Button Style="{StaticResource NavButton}" Content="Raporty"    Tag="Reports"  Click="NavButton_Click" />
                     <Button Style="{StaticResource NavButton}" Content="Ustawienia" Tag="Settings" Click="NavButton_Click" />
                 </StackPanel>
             </DockPanel>
@@ -46,18 +46,7 @@
 
         <!-- Main content area -->
         <Border Grid.Column="2" Padding="32,28">
-            <Grid>
-                <TextBlock x:Name="PageTitle"
-                           Text="Dziś"
-                           Style="{StaticResource HeaderText}"
-                           VerticalAlignment="Top" />
-
-                <TextBlock Text="Wybierz sekcję z menu bocznego."
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Center"
-                           Foreground="Gray"
-                           FontSize="16" />
-            </Grid>
+            <ContentControl x:Name="MainContent" />
         </Border>
     </Grid>
 </Window>

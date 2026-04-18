@@ -75,6 +75,15 @@ Desktopowa aplikacja .NET do śledzenia czasu pracy nad zadaniami, wzorowana na 
 - Zamykanie zadań w aplikacji, jeśli powiązany work item w TFS jest zamknięty
 - Import nowych work itemów przypisanych do aktualnie zalogowanego użytkownika Windows jako nowe zadania
 
+## Konwencje trwałości danych
+
+### Soft delete
+Wszystkie encje domenowe są usuwane wyłącznie przez soft delete:
+- Każda encja posiada pole `bool IsDeleted` (domyślnie `false`).
+- Fizyczne usunięcie rekordu (`DELETE`) jest niedozwolone.
+- `AppDbContext` konfiguruje globalny query filter `HasQueryFilter(e => !e.IsDeleted)` dla każdej encji — usunięte rekordy są niewidoczne domyślnie.
+- Operacje "usuń" w aplikacji ustawiają `IsDeleted = true` i zapisują zmiany.
+
 ## Wzorzec architektoniczny
 
 Clean Architecture:

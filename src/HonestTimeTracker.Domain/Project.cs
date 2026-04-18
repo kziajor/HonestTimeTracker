@@ -11,4 +11,6 @@ public class Project
     public string? TfsProjectId { get; set; }
 
     public ICollection<WorkTask> Tasks { get; set; } = new List<WorkTask>();
+
+    public bool IsDeleted { get; set; }
 }

@@ -7,4 +7,6 @@ public class TfsCollection
     public string Url { get; set; } = string.Empty;
 
     public ICollection<Project> Projects { get; set; } = new List<Project>();
+
+    public bool IsDeleted { get; set; }
 }
