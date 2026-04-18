@@ -6,6 +6,6 @@ public record RecordDto(
     string TaskTitle,
     string? ProjectName,
     DateTime StartedAt,
-    DateTime FinishedAt,
+    DateTime? FinishedAt,
     int MinutesSpent,
     string? Comment);

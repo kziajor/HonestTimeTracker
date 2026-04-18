@@ -24,6 +24,15 @@ public class DateOnlyConverter : IValueConverter
         value is DateTime dt ? DateOnly.FromDateTime(dt) : DateOnly.FromDateTime(DateTime.Today);
 }
 
+public class NullToBoolConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
+        value is not null;
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        throw new NotSupportedException();
+}
+
 [ValueConversion(typeof(int), typeof(string))]
 public class MinutesToHoursConverter : IValueConverter
 {

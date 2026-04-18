@@ -48,10 +48,14 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IValidator<CreateRecordCommand>, CreateRecordCommandValidator>();
         services.AddScoped<IValidator<UpdateRecordCommand>, UpdateRecordCommandValidator>();
         services.AddScoped<IValidator<DeleteRecordCommand>, DeleteRecordCommandValidator>();
+        services.AddScoped<IValidator<StartTimerCommand>, StartTimerCommandValidator>();
+        services.AddScoped<IValidator<StopTimerCommand>, StopTimerCommandValidator>();
 
         services.AddCommandHandler<CreateRecordCommand, CreateRecordCommandHandler, int>();
         services.AddCommandHandler<UpdateRecordCommand, UpdateRecordCommandHandler, Unit>();
         services.AddCommandHandler<DeleteRecordCommand, DeleteRecordCommandHandler, Unit>();
+        services.AddCommandHandler<StartTimerCommand, StartTimerCommandHandler, int>();
+        services.AddCommandHandler<StopTimerCommand, StopTimerCommandHandler, Unit>();
 
         services.AddScoped<IQueryHandler<GetRecordsQuery, List<RecordDto>>, GetRecordsQueryHandler>();
 

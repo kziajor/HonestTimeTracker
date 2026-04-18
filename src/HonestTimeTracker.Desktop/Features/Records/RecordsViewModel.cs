@@ -109,8 +109,11 @@ public class RecordsViewModel : ViewModelBase
 
     private async Task DeleteAsync(RecordDto record)
     {
+        var timeRange = record.FinishedAt.HasValue
+            ? $"{record.StartedAt:HH:mm}–{record.FinishedAt:HH:mm}"
+            : $"{record.StartedAt:HH:mm}–running";
         var confirm = MessageBox.Show(
-            $"Are you sure you want to delete this record?\n{record.TaskTitle} — {record.StartedAt:HH:mm}–{record.FinishedAt:HH:mm}",
+            $"Are you sure you want to delete this record?\n{record.TaskTitle} — {timeRange}",
             "Delete record",
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);

@@ -12,7 +12,6 @@ public class RecordRepository(AppDbContext db) : IRecordRepository
         var query = db.Records
             .Include(r => r.Task)
             .ThenInclude(t => t.Project)
-            .Where(r => r.FinishedAt != null)
             .AsQueryable();
 
         if (taskId.HasValue)
@@ -29,6 +28,11 @@ public class RecordRepository(AppDbContext db) : IRecordRepository
 
     public Task<WorkRecord?> GetByIdAsync(int id, CancellationToken ct) =>
         db.Records.FirstOrDefaultAsync(r => r.Id == id, ct);
+
+    public Task<WorkRecord?> GetActiveAsync(CancellationToken ct) =>
+        db.Records
+            .Include(r => r.Task)
+            .FirstOrDefaultAsync(r => r.FinishedAt == null, ct);
 
     public async Task AddAsync(WorkRecord record, CancellationToken ct) =>
         await db.Records.AddAsync(record, ct);

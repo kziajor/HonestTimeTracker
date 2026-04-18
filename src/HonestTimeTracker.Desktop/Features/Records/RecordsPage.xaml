@@ -56,7 +56,7 @@
                                     <TextBlock>
                                         <Run Text="{Binding StartedAt, StringFormat=\{0:HH:mm\}}" />
                                         <Run Text="–" />
-                                        <Run Text="{Binding FinishedAt, StringFormat=\{0:HH:mm\}}" />
+                                        <Run Text="{Binding FinishedAt, StringFormat=\{0:HH:mm\}, TargetNullValue=running}" />
                                     </TextBlock>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
@@ -127,9 +127,10 @@
                                             </Viewbox>
                                         </Button>
 
-                                        <!-- Edit -->
+                                        <!-- Edit — disabled for active (running) records -->
                                         <Button Style="{StaticResource IconButtonNeutral}"
                                                 ToolTip="Edit"
+                                                IsEnabled="{Binding FinishedAt, Converter={StaticResource NullToBoolConverter}}"
                                                 Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}">
                                             <Viewbox Width="15" Height="15">

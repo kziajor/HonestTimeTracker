@@ -7,6 +7,7 @@
     <common:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
     <common:DateOnlyConverter x:Key="DateOnlyConverter" />
     <common:MinutesToHoursConverter x:Key="MinutesToHours" />
+    <common:NullToBoolConverter x:Key="NullToBoolConverter" />
 
     <!-- Honest IT Brand Colors -->
     <Color x:Key="PrimaryColor">#FFFBCB18</Color>

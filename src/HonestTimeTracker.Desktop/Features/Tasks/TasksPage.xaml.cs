@@ -1,3 +1,4 @@
+using System.Windows;
 using System.Windows.Controls;
 
 namespace HonestTimeTracker.Desktop.Features.Tasks;
@@ -18,9 +19,18 @@ public partial class TasksPage : UserControl
 
     private void UpdateTitleColumnWidth()
     {
-        const double fixedWidth = 160 + 90 + 120 + 110 + 120; // Projekt + Plan + Spędzony + Status + Akcje
+        const double fixedWidth = 160 + 90 + 120 + 110 + 110; // Projekt + Plan + Spędzony + Status + Akcje
         var available = TaskListView.ActualWidth - fixedWidth - 26;
         if (available > 80)
             TitleColumn.Width = available;
+    }
+
+    private void MoreActions_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.ContextMenu is { } menu)
+        {
+            menu.PlacementTarget = btn;
+            menu.IsOpen = true;
+        }
     }
 }

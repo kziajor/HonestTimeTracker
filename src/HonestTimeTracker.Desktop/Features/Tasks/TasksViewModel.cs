@@ -1,5 +1,6 @@
 using HonestTimeTracker.Application;
 using HonestTimeTracker.Application.Projects;
+using HonestTimeTracker.Application.Records;
 using HonestTimeTracker.Application.Tasks;
 using HonestTimeTracker.Desktop.Common;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,8 @@ public class TasksViewModel : ViewModelBase
     public ICommand EditCommand { get; }
     public ICommand DeleteCommand { get; }
     public ICommand ToggleClosedCommand { get; }
+    public ICommand StartTimerCommand { get; }
+    public ICommand StopTimerCommand { get; }
 
     public TasksViewModel(IServiceScopeFactory scopeFactory)
     {
@@ -34,6 +37,8 @@ public class TasksViewModel : ViewModelBase
         EditCommand = new AsyncRelayCommand(p => EditAsync((TaskDto)p!), p => p is TaskDto);
         DeleteCommand = new AsyncRelayCommand(p => DeleteAsync((TaskDto)p!), p => p is TaskDto);
         ToggleClosedCommand = new AsyncRelayCommand(p => ToggleClosedAsync((TaskDto)p!), p => p is TaskDto);
+        StartTimerCommand = new AsyncRelayCommand(p => StartTimerAsync((TaskDto)p!), p => p is TaskDto);
+        StopTimerCommand = new AsyncRelayCommand(p => StopTimerAsync((TaskDto)p!), p => p is TaskDto);
     }
 
     public async Task LoadAsync()
@@ -123,6 +128,60 @@ public class TasksViewModel : ViewModelBase
         try
         {
             await handler.HandleAsync(new ToggleTaskClosedCommand(task.Id));
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private async Task StartTimerAsync(TaskDto task)
+    {
+        var activeTask = Tasks.FirstOrDefault(t => t.HasActiveTimer);
+        if (activeTask is not null && activeTask.Id != task.Id)
+        {
+            var confirm = MessageBox.Show(
+                $"Timer is running for \"{activeTask.Title}\".\nStop it and start tracking \"{task.Title}\"?",
+                "Timer already running",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (confirm != MessageBoxResult.Yes) return;
+
+            using var stopScope = _scopeFactory.CreateScope();
+            var stopHandler = stopScope.ServiceProvider.GetRequiredService<ICommandHandler<StopTimerCommand, Unit>>();
+            try
+            {
+                await stopHandler.HandleAsync(new StopTimerCommand());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+        }
+
+        using var scope = _scopeFactory.CreateScope();
+        var handler = scope.ServiceProvider.GetRequiredService<ICommandHandler<StartTimerCommand, int>>();
+        try
+        {
+            await handler.HandleAsync(new StartTimerCommand(task.Id));
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private async Task StopTimerAsync(TaskDto task)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var handler = scope.ServiceProvider.GetRequiredService<ICommandHandler<StopTimerCommand, Unit>>();
+        try
+        {
+            await handler.HandleAsync(new StopTimerCommand());
             await LoadAsync();
         }
         catch (Exception ex)

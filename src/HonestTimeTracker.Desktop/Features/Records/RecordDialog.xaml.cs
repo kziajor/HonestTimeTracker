@@ -27,7 +27,7 @@ public partial class RecordDialog : Window
             TaskComboBox.SelectedItem = taskList.FirstOrDefault(t => t.Id == existing.TaskId);
             DatePicker.SelectedDate = existing.StartedAt.Date;
             StartTimeBox.Text = existing.StartedAt.ToString("HH:mm");
-            EndTimeBox.Text = existing.FinishedAt.ToString("HH:mm");
+            EndTimeBox.Text = existing.FinishedAt?.ToString("HH:mm") ?? string.Empty;
             CommentBox.Text = existing.Comment ?? string.Empty;
         }
         else

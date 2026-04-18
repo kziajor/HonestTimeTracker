@@ -6,6 +6,7 @@ public interface IRecordRepository
 {
     Task<List<WorkRecord>> GetAllAsync(int? taskId, DateOnly? date, CancellationToken ct);
     Task<WorkRecord?> GetByIdAsync(int id, CancellationToken ct);
+    Task<WorkRecord?> GetActiveAsync(CancellationToken ct);
     Task AddAsync(WorkRecord record, CancellationToken ct);
     Task SaveChangesAsync(CancellationToken ct);
 }
@@ -25,7 +26,7 @@ public class GetRecordsQueryHandler(IRecordRepository repository)
                 r.Task.Title,
                 r.Task.Project?.Name,
                 r.StartedAt,
-                r.FinishedAt!.Value,
+                r.FinishedAt,
                 r.MinutesSpent,
                 r.Comment))
             .ToList();

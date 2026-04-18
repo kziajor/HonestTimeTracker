@@ -118,51 +118,53 @@
                         </GridViewColumn>
 
                         <!-- Actions -->
-                        <GridViewColumn Header="Actions" Width="120">
+                        <GridViewColumn Header="Actions" Width="110">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
 
-                                        <!-- Usuń (trash-2) — czerwony -->
-                                        <Button Style="{StaticResource IconButtonDanger}"
-                                                ToolTip="Delete task"
+                                        <!-- Start timer (play) — zielony, widoczny gdy brak aktywnego timera -->
+                                        <Button ToolTip="Start timer"
                                                 Margin="0,0,4,0"
-                                                Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                Visibility="{Binding HasActiveTimer, Converter={StaticResource InverseBoolToVisibility}}"
+                                                Command="{Binding DataContext.StartTimerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource IconButtonPrimary}">
+                                                    <Setter Property="Background" Value="#2E7D32" />
+                                                    <Setter Property="BorderBrush" Value="#2E7D32" />
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Background" Value="#1B5E20" />
+                                                            <Setter Property="BorderBrush" Value="#1B5E20" />
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
                                             <Viewbox Width="15" Height="15">
                                                 <Canvas Width="24" Height="24">
-                                                    <Path Stroke="White" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"
-                                                          Data="M3 6h18"/>
-                                                    <Path Stroke="White" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"
-                                                          Data="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
-                                                    <Path Stroke="White" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"
-                                                          Data="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-                                                    <Path Stroke="White" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"
-                                                          Data="M10 11v6"/>
-                                                    <Path Stroke="White" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"
-                                                          Data="M14 11v6"/>
+                                                    <Path Fill="White" Data="M5 3l14 9-14 9V3z"/>
                                                 </Canvas>
                                             </Viewbox>
                                         </Button>
 
-                                        <!-- Edytuj (pencil) — szary -->
-                                        <Button Style="{StaticResource IconButtonNeutral}"
-                                                ToolTip="Edit"
+                                        <!-- Stop timer (square) — czerwony, widoczny gdy timer aktywny -->
+                                        <Button Style="{StaticResource IconButtonDanger}"
+                                                ToolTip="Stop timer"
                                                 Margin="0,0,4,0"
-                                                Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                Visibility="{Binding HasActiveTimer, Converter={StaticResource BoolToVisibility}}"
+                                                Command="{Binding DataContext.StopTimerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}">
                                             <Viewbox Width="15" Height="15">
                                                 <Canvas Width="24" Height="24">
-                                                    <Path Stroke="#444444" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"
-                                                          Data="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
-                                                    <Path Stroke="#444444" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"
-                                                          Data="M15 5l4 4"/>
+                                                    <Rectangle Canvas.Left="3" Canvas.Top="3" Width="18" Height="18" Fill="White" RadiusX="2" RadiusY="2"/>
                                                 </Canvas>
                                             </Viewbox>
                                         </Button>
 
                                         <!-- Zamknij / Otwórz (check / rotate-ccw) — żółty -->
-                                        <Button Command="{Binding DataContext.ToggleClosedCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        <Button Margin="0,0,4,0"
+                                                Command="{Binding DataContext.ToggleClosedCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}">
                                             <Button.Style>
                                                 <Style TargetType="Button" BasedOn="{StaticResource IconButtonPrimary}">
@@ -176,17 +178,63 @@
                                             </Button.Style>
                                             <Viewbox Width="15" Height="15">
                                                 <Canvas Width="24" Height="24">
-                                                    <!-- check — gdy zadanie otwarte -->
                                                     <Path Stroke="Black" StrokeThickness="2.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"
                                                           Visibility="{Binding Closed, Converter={StaticResource InverseBoolToVisibility}}"
                                                           Data="M20 6 9 17l-5-5"/>
-                                                    <!-- rotate-ccw — gdy zadanie zamknięte -->
                                                     <Path Stroke="Black" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"
                                                           Visibility="{Binding Closed, Converter={StaticResource BoolToVisibility}}"
                                                           Data="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
                                                     <Path Stroke="Black" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"
                                                           Visibility="{Binding Closed, Converter={StaticResource BoolToVisibility}}"
                                                           Data="M3 3v5h5"/>
+                                                </Canvas>
+                                            </Viewbox>
+                                        </Button>
+
+                                        <!-- Trzy kropki — menu z edycją i usuwaniem -->
+                                        <Button Style="{StaticResource IconButtonNeutral}"
+                                                ToolTip="More actions"
+                                                Click="MoreActions_Click"
+                                                Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                            <Button.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Edit"
+                                                              Command="{Binding PlacementTarget.Tag.EditCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                                        <MenuItem.Icon>
+                                                            <Viewbox Width="14" Height="14">
+                                                                <Canvas Width="24" Height="24">
+                                                                    <Path Stroke="#444444" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"
+                                                                          Data="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                                                                    <Path Stroke="#444444" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"
+                                                                          Data="M15 5l4 4"/>
+                                                                </Canvas>
+                                                            </Viewbox>
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                    <MenuItem Header="Delete"
+                                                              Command="{Binding PlacementTarget.Tag.DeleteCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                                        <MenuItem.Icon>
+                                                            <Viewbox Width="14" Height="14">
+                                                                <Canvas Width="24" Height="24">
+                                                                    <Path Stroke="#CC0000" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"
+                                                                          Data="M3 6h18"/>
+                                                                    <Path Stroke="#CC0000" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"
+                                                                          Data="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                                                                    <Path Stroke="#CC0000" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"
+                                                                          Data="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                                                                </Canvas>
+                                                            </Viewbox>
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                </ContextMenu>
+                                            </Button.ContextMenu>
+                                            <Viewbox Width="15" Height="15">
+                                                <Canvas Width="24" Height="24">
+                                                    <Ellipse Canvas.Left="11" Canvas.Top="4"  Width="2" Height="2" Fill="#444444"/>
+                                                    <Ellipse Canvas.Left="11" Canvas.Top="11" Width="2" Height="2" Fill="#444444"/>
+                                                    <Ellipse Canvas.Left="11" Canvas.Top="18" Width="2" Height="2" Fill="#444444"/>
                                                 </Canvas>
                                             </Viewbox>
                                         </Button>
