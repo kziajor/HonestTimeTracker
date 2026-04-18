@@ -66,6 +66,7 @@ public static class ServiceCollectionExtensions
         services.AddCommandHandler<StopTimerCommand, StopTimerCommandHandler, Unit>();
 
         services.AddScoped<IQueryHandler<GetRecordsQuery, List<RecordDto>>, GetRecordsQueryHandler>();
+        services.AddScoped<IQueryHandler<GetRecordsSummaryQuery, RecordsSummaryDto?>, GetRecordsSummaryQueryHandler>();
 
         services.AddScoped<IValidator<UpdateSettingsCommand>, UpdateSettingsCommandValidator>();
         services.AddCommandHandler<UpdateSettingsCommand, UpdateSettingsCommandHandler, Unit>();

@@ -6,6 +6,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -31,8 +32,67 @@
                         VerticalAlignment="Center" />
         </StackPanel>
 
+        <!-- Summary bar -->
+        <Border Grid.Row="2"
+                Margin="0,0,0,12"
+                Padding="14,10"
+                Background="{StaticResource PrimaryBrush}"
+                CornerRadius="4"
+                Visibility="{Binding HasSummary, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel Orientation="Horizontal">
+
+                <!-- Actual -->
+                <StackPanel Margin="0,0,28,0">
+                    <TextBlock Text="Actual" FontSize="11" Foreground="#7a6000" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding SummaryActual}" FontSize="16" FontWeight="Bold" />
+                </StackPanel>
+
+                <!-- Required -->
+                <StackPanel Margin="0,0,28,0">
+                    <TextBlock Text="Required" FontSize="11" Foreground="#7a6000" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding SummaryRequired}" FontSize="16" FontWeight="Bold" />
+                </StackPanel>
+
+                <!-- Balance -->
+                <StackPanel Margin="0,0,28,0">
+                    <TextBlock FontSize="11" Foreground="#7a6000" FontWeight="SemiBold">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="Deficit" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SummaryIsPositive}" Value="True">
+                                        <Setter Property="Text" Value="Overtime" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <TextBlock Text="{Binding SummaryBalance}" FontSize="16" FontWeight="Bold">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="#c0392b" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SummaryIsPositive}" Value="True">
+                                        <Setter Property="Foreground" Value="#1e8449" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+
+                <!-- Working days context -->
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{Binding SummaryWorkingDays}"
+                               FontSize="12"
+                               Foreground="#7a6000" />
+                </StackPanel>
+
+            </StackPanel>
+        </Border>
+
         <!-- Records list -->
-        <Border Grid.Row="2" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4">
+        <Border Grid.Row="3" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4">
             <ListView x:Name="RecordsListView"
                       ItemsSource="{Binding Records}"
                       BorderThickness="0"

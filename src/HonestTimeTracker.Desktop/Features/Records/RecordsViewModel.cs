@@ -5,6 +5,7 @@ using HonestTimeTracker.Application.Tasks;
 using HonestTimeTracker.Desktop.Common;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Input;
 using WpfApp = System.Windows.Application;
@@ -16,8 +17,35 @@ public class RecordsViewModel : ViewModelBase
     private readonly IServiceScopeFactory _scopeFactory;
     private DateOnly _filterDate = DateOnly.FromDateTime(DateTime.Today);
     private bool _filterByDate = true;
+    private RecordsSummaryDto? _summary;
 
     public ObservableCollection<RecordDto> Records { get; } = [];
+
+    public RecordsSummaryDto? Summary
+    {
+        get => _summary;
+        private set
+        {
+            if (Set(ref _summary, value))
+            {
+                OnPropertyChanged(nameof(HasSummary));
+                OnPropertyChanged(nameof(SummaryActual));
+                OnPropertyChanged(nameof(SummaryRequired));
+                OnPropertyChanged(nameof(SummaryBalance));
+                OnPropertyChanged(nameof(SummaryIsPositive));
+                OnPropertyChanged(nameof(SummaryWorkingDays));
+            }
+        }
+    }
+
+    public bool HasSummary => _summary != null;
+    public string SummaryActual => _summary != null ? _summary.ActualHours.ToString("F2", CultureInfo.InvariantCulture) + " h" : "";
+    public string SummaryRequired => _summary != null ? _summary.RequiredHours.ToString("F2", CultureInfo.InvariantCulture) + " h" : "";
+    public string SummaryBalance => _summary != null
+        ? (_summary.OvertimeHours >= 0 ? "+" : "") + _summary.OvertimeHours.ToString("F2", CultureInfo.InvariantCulture) + " h"
+        : "";
+    public bool SummaryIsPositive => _summary?.OvertimeHours >= 0;
+    public string SummaryWorkingDays => _summary != null ? $"{_summary.WorkingDays} working days" : "";
 
     public DateOnly FilterDate
     {
@@ -60,6 +88,11 @@ public class RecordsViewModel : ViewModelBase
         var records = await handler.HandleAsync(new GetRecordsQuery(Date: date));
         Records.Clear();
         foreach (var r in records) Records.Add(r);
+
+        var summaryHandler = scope.ServiceProvider.GetRequiredService<IQueryHandler<GetRecordsSummaryQuery, RecordsSummaryDto?>>();
+        DateOnly? from = _filterByDate ? _filterDate : null;
+        DateOnly? to = _filterByDate ? _filterDate : null;
+        Summary = await summaryHandler.HandleAsync(new GetRecordsSummaryQuery(from, to));
     }
 
     private async Task<List<TaskDto>> GetTasksAsync()
