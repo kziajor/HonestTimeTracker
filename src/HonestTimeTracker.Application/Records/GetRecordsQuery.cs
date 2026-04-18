@@ -5,6 +5,8 @@ namespace HonestTimeTracker.Application.Records;
 public interface IRecordRepository
 {
     Task<List<WorkRecord>> GetAllAsync(int? taskId, DateOnly? date, CancellationToken ct);
+    Task<List<WorkRecord>> GetByDateRangeAsync(DateOnly from, DateOnly to, CancellationToken ct);
+    Task<DateOnly?> GetEarliestDateAsync(CancellationToken ct);
     Task<WorkRecord?> GetByIdAsync(int id, CancellationToken ct);
     Task<WorkRecord?> GetActiveAsync(CancellationToken ct);
     Task AddAsync(WorkRecord record, CancellationToken ct);

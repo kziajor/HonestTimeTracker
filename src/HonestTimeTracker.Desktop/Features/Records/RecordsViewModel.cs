@@ -43,6 +43,15 @@ public class RecordsViewModel : ViewModelBase
         DeleteCommand = new AsyncRelayCommand(p => DeleteAsync((RecordDto)p!), p => p is RecordDto);
     }
 
+    public async Task LoadWithDateAsync(DateOnly date)
+    {
+        _filterByDate = true;
+        _filterDate = date;
+        OnPropertyChanged(nameof(FilterByDate));
+        OnPropertyChanged(nameof(FilterDate));
+        await LoadAsync();
+    }
+
     public async Task LoadAsync()
     {
         using var scope = _scopeFactory.CreateScope();

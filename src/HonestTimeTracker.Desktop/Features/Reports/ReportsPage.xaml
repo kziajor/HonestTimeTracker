@@ -1,0 +1,296 @@
+<UserControl x:Class="HonestTimeTracker.Desktop.Features.Reports.ReportsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0"
+                   Text="Norm Report"
+                   Style="{StaticResource HeaderText}"
+                   Margin="0,0,0,20" />
+
+        <!-- Filters -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,20">
+            <TextBlock Text="Year" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" />
+            <TextBox Text="{Binding Year, UpdateSourceTrigger=PropertyChanged}"
+                     Width="72"
+                     Padding="8,6"
+                     FontSize="14"
+                     BorderBrush="#CCCCCC"
+                     BorderThickness="1" />
+
+            <TextBlock Text="Month" VerticalAlignment="Center" FontWeight="SemiBold" Margin="20,0,8,0" />
+            <ComboBox ItemsSource="{Binding Months}"
+                      SelectedItem="{Binding SelectedMonth}"
+                      DisplayMemberPath="Label"
+                      Width="130"
+                      Padding="8,6"
+                      FontSize="14" />
+
+            <Button Content="Calculate"
+                    Command="{Binding CalculateCommand}"
+                    Margin="20,0,0,0"
+                    Padding="20,8" />
+        </StackPanel>
+
+        <!-- Summary cards (visible only when HasReport = true) -->
+        <WrapPanel Grid.Row="2"
+                   Margin="0,0,0,20"
+                   Visibility="{Binding HasReport, Converter={StaticResource BoolToVisibility}}">
+
+            <!-- Required hours -->
+            <Border Background="#F5F5F5" CornerRadius="6" Padding="16,12" Margin="0,0,12,8" MinWidth="140">
+                <StackPanel>
+                    <TextBlock Text="Required" FontSize="11" Foreground="#888888" FontWeight="SemiBold" />
+                    <TextBlock FontSize="22" FontWeight="Bold" Margin="0,4,0,0">
+                        <Run Text="{Binding RequiredHours}" /><Run Text=" h" Foreground="#888888" FontSize="14" />
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+            <!-- Actual hours -->
+            <Border Background="#F5F5F5" CornerRadius="6" Padding="16,12" Margin="0,0,12,8" MinWidth="140">
+                <StackPanel>
+                    <TextBlock Text="Actual" FontSize="11" Foreground="#888888" FontWeight="SemiBold" />
+                    <TextBlock FontSize="22" FontWeight="Bold" Margin="0,4,0,0">
+                        <Run Text="{Binding ActualHours}" /><Run Text=" h" Foreground="#888888" FontSize="14" />
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+            <!-- Overtime / deficit -->
+            <Border CornerRadius="6" Padding="16,12" Margin="0,0,12,8" MinWidth="140">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Background" Value="#F5F5F5" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsOvertime}" Value="True">
+                                <Setter Property="Background" Value="#E8F5E9" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsDeficit}" Value="True">
+                                <Setter Property="Background" Value="#FFEBEE" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <StackPanel>
+                    <TextBlock FontSize="11" Foreground="#888888" FontWeight="SemiBold">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="Balance" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsOvertime}" Value="True">
+                                        <Setter Property="Text" Value="Overtime" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsDeficit}" Value="True">
+                                        <Setter Property="Text" Value="Deficit" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <TextBlock FontSize="22" FontWeight="Bold" Margin="0,4,0,0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="#444444" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsOvertime}" Value="True">
+                                        <Setter Property="Foreground" Value="#2E7D32" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsDeficit}" Value="True">
+                                        <Setter Property="Foreground" Value="#C62828" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                        <Run Text="{Binding OvertimeLabel}" />
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+            <!-- Working days -->
+            <Border Background="#F5F5F5" CornerRadius="6" Padding="16,12" Margin="0,0,12,8" MinWidth="120">
+                <StackPanel>
+                    <TextBlock Text="Working days" FontSize="11" Foreground="#888888" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding WorkingDays}" FontSize="22" FontWeight="Bold" Margin="0,4,0,0" />
+                </StackPanel>
+            </Border>
+
+            <!-- Leave days -->
+            <Border Background="#F5F5F5" CornerRadius="6" Padding="16,12" Margin="0,0,0,8" MinWidth="120">
+                <StackPanel>
+                    <TextBlock Text="Leave days" FontSize="11" Foreground="#888888" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding LeaveDays}" FontSize="22" FontWeight="Bold" Margin="0,4,0,0" />
+                </StackPanel>
+            </Border>
+
+        </WrapPanel>
+
+        <!-- Details table -->
+        <Grid Grid.Row="3" Visibility="{Binding HasReport, Converter={StaticResource BoolToVisibility}}">
+
+            <!-- Per-month table (year mode) -->
+            <Border BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4"
+                    Visibility="{Binding IsYearMode, Converter={StaticResource BoolToVisibility}}">
+                <ListView ItemsSource="{Binding MonthRows}"
+                          BorderThickness="0"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                          MouseDoubleClick="MonthList_MouseDoubleClick">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Month" Width="160">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding MonthName}" FontWeight="SemiBold" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Working days" Width="110">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding WorkingDays}" HorizontalAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Leave days" Width="90">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding LeaveDays}" HorizontalAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Required (h)" Width="110">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding RequiredLabel}" HorizontalAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Actual (h)" Width="100">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding ActualLabel}" HorizontalAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Delta (h)" Width="100">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding DeltaLabel}" HorizontalAlignment="Right" FontWeight="SemiBold">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="#444444" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsDeltaPositive}" Value="True">
+                                                            <Setter Property="Foreground" Value="#2E7D32" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsDeltaNegative}" Value="True">
+                                                            <Setter Property="Foreground" Value="#C62828" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </Border>
+
+            <!-- Per-day table (month mode) -->
+            <Border BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4"
+                    Visibility="{Binding IsYearMode, Converter={StaticResource InverseBoolToVisibility}}">
+                <ListView ItemsSource="{Binding DayRows}"
+                          BorderThickness="0"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                          MouseDoubleClick="DayList_MouseDoubleClick">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Date" Width="110">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding DateLabel}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Day" Width="50">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding DayName}" Foreground="#666666" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Type" Width="80">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Type}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="#444444" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsWeekend}" Value="True">
+                                                            <Setter Property="Foreground" Value="#888888" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsLeave}" Value="True">
+                                                            <Setter Property="Foreground" Value="#1565C0" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Required (h)" Width="110">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding RequiredLabel}" HorizontalAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Actual (h)" Width="100">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding ActualLabel}" HorizontalAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Delta (h)" Width="100">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding DeltaLabel}" HorizontalAlignment="Right" FontWeight="SemiBold">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="#444444" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsDeltaPositive}" Value="True">
+                                                            <Setter Property="Foreground" Value="#2E7D32" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsDeltaNegative}" Value="True">
+                                                            <Setter Property="Foreground" Value="#C62828" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </Border>
+
+        </Grid>
+
+    </Grid>
+</UserControl>

@@ -1,4 +1,5 @@
 using HonestTimeTracker.Desktop.Features.Leaves;
+using HonestTimeTracker.Desktop.Features.Reports;
 using HonestTimeTracker.Desktop.Features.Projects;
 using HonestTimeTracker.Desktop.Features.Records;
 using HonestTimeTracker.Desktop.Features.Settings;
@@ -39,6 +40,8 @@ public partial class App : System.Windows.Application
         services.AddTransient<SettingsPage>();
         services.AddTransient<LeaveViewModel>();
         services.AddTransient<LeavePage>();
+        services.AddTransient<ReportsViewModel>();
+        services.AddTransient<ReportsPage>();
 
         Services = services.BuildServiceProvider();
 

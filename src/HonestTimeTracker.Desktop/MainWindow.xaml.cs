@@ -1,4 +1,5 @@
 using HonestTimeTracker.Desktop.Features.Leaves;
+using HonestTimeTracker.Desktop.Features.Reports;
 using HonestTimeTracker.Desktop.Features.Projects;
 using HonestTimeTracker.Desktop.Features.Records;
 using HonestTimeTracker.Desktop.Features.Settings;
@@ -16,6 +17,13 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         Loaded += async (_, _) => await NavigateToAsync("Projects");
+    }
+
+    public async Task NavigateToRecordsAsync(DateOnly date)
+    {
+        var page = App.Services.GetRequiredService<RecordsPage>();
+        MainContent.Content = page;
+        await page.InitializeAsync(date);
     }
 
     private async void NavButton_Click(object sender, RoutedEventArgs e)
@@ -56,6 +64,12 @@ public partial class MainWindow : Window
                 var leavePage = App.Services.GetRequiredService<LeavePage>();
                 MainContent.Content = leavePage;
                 await leavePage.InitializeAsync();
+                break;
+
+            case "Reports":
+                var reportsPage = App.Services.GetRequiredService<ReportsPage>();
+                MainContent.Content = reportsPage;
+                await reportsPage.InitializeAsync();
                 break;
 
             case "Settings":

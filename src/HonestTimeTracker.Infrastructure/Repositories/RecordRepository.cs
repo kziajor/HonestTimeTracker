@@ -26,6 +26,21 @@ public class RecordRepository(AppDbContext db) : IRecordRepository
         return query.OrderByDescending(r => r.StartedAt).ToListAsync(ct);
     }
 
+    public Task<List<WorkRecord>> GetByDateRangeAsync(DateOnly from, DateOnly to, CancellationToken ct)
+    {
+        var fromDt = from.ToDateTime(TimeOnly.MinValue);
+        var toDt = to.ToDateTime(TimeOnly.MaxValue);
+        return db.Records
+            .Where(r => r.StartedAt >= fromDt && r.StartedAt <= toDt)
+            .ToListAsync(ct);
+    }
+
+    public async Task<DateOnly?> GetEarliestDateAsync(CancellationToken ct)
+    {
+        var min = await db.Records.MinAsync(r => (DateTime?)r.StartedAt, ct);
+        return min.HasValue ? DateOnly.FromDateTime(min.Value) : null;
+    }
+
     public Task<WorkRecord?> GetByIdAsync(int id, CancellationToken ct) =>
         db.Records.FirstOrDefaultAsync(r => r.Id == id, ct);
 

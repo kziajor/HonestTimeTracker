@@ -1,6 +1,7 @@
 using FluentValidation;
 using HonestTimeTracker.Application;
 using HonestTimeTracker.Application.Leaves;
+using HonestTimeTracker.Application.Reports;
 using HonestTimeTracker.Application.Projects;
 using HonestTimeTracker.Application.Records;
 using HonestTimeTracker.Application.Settings;
@@ -79,6 +80,8 @@ public static class ServiceCollectionExtensions
         services.AddCommandHandler<DeleteLeaveCommand, DeleteLeaveCommandHandler, Unit>();
 
         services.AddScoped<IQueryHandler<GetLeavesQuery, List<LeaveDto>>, GetLeavesQueryHandler>();
+
+        services.AddScoped<IQueryHandler<GetNormReportQuery, NormReportDto>, GetNormReportQueryHandler>();
 
         return services;
     }

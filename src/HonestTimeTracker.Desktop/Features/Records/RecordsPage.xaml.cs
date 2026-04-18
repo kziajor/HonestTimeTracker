@@ -14,4 +14,5 @@ public partial class RecordsPage : UserControl
     }
 
     public async Task InitializeAsync() => await _vm.LoadAsync();
+    public async Task InitializeAsync(DateOnly date) => await _vm.LoadWithDateAsync(date);
 }
