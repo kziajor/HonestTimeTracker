@@ -63,10 +63,10 @@
                         </GridViewColumn>
 
                         <!-- Duration -->
-                        <GridViewColumn Header="Duration (min)" Width="110">
+                        <GridViewColumn Header="Duration (h)" Width="110">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding MinutesSpent}" HorizontalAlignment="Right" />
+                                    <TextBlock Text="{Binding MinutesSpent, Converter={StaticResource MinutesToHours}}" HorizontalAlignment="Right" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>

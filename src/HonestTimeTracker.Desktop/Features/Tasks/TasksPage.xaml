@@ -64,19 +64,19 @@
                         </GridViewColumn>
 
                         <!-- Planned time -->
-                        <GridViewColumn Header="Plan (min)" Width="90">
+                        <GridViewColumn Header="Plan (h)" Width="90">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding PlannedMinutes}" HorizontalAlignment="Right" />
+                                    <TextBlock Text="{Binding PlannedMinutes, Converter={StaticResource MinutesToHours}}" HorizontalAlignment="Right" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
 
                         <!-- Spent time -->
-                        <GridViewColumn Header="Spent (min)" Width="120">
+                        <GridViewColumn Header="Spent (h)" Width="120">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding SpentMinutes}" HorizontalAlignment="Right" />
+                                    <TextBlock Text="{Binding SpentMinutes, Converter={StaticResource MinutesToHours}}" HorizontalAlignment="Right" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>

@@ -7,7 +7,7 @@ namespace HonestTimeTracker.Desktop.Features.Tasks;
 public partial class TaskDialog : Window
 {
     public string TaskTitle => TitleBox.Text.Trim();
-    public int PlannedMinutes => int.TryParse(PlannedMinutesBox.Text, out var v) ? Math.Max(0, v) : 0;
+    public int PlannedMinutes { get; private set; }
     public int ProjectId => ((ProjectDto)ProjectComboBox.SelectedItem).Id;
 
     public TaskDialog(IEnumerable<ProjectDto> projects, string? existingTitle = null, int existingPlannedMinutes = 0, int? existingProjectId = null)
@@ -24,7 +24,7 @@ public partial class TaskDialog : Window
         {
             TitleText.Text = "Edit task";
             TitleBox.Text = existingTitle;
-            PlannedMinutesBox.Text = existingPlannedMinutes.ToString();
+            PlannedHoursBox.Text = (existingPlannedMinutes / 60.0).ToString("F2", System.Globalization.CultureInfo.CurrentCulture);
             OkButton.Content = "Save changes";
         }
 
@@ -45,13 +45,16 @@ public partial class TaskDialog : Window
             return;
         }
 
-        if (!int.TryParse(PlannedMinutesBox.Text, out var minutes) || minutes < 0)
+        var hoursText = PlannedHoursBox.Text.Replace(',', '.');
+        if (!double.TryParse(hoursText, System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture, out var hours) || hours < 0)
         {
-            MessageBox.Show("Planned time must be a non-negative number.", "Validation",
+            MessageBox.Show("Planned time must be a non-negative number of hours (e.g. 8 or 8.50).", "Validation",
                 MessageBoxButton.OK, MessageBoxImage.Warning);
-            PlannedMinutesBox.Focus();
+            PlannedHoursBox.Focus();
             return;
         }
+        PlannedMinutes = (int)Math.Round(hours * 60);
 
         if (ProjectComboBox.SelectedItem is null)
         {

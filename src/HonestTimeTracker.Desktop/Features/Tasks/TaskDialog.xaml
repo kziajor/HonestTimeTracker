@@ -36,10 +36,10 @@
                  Margin="0,0,0,16"
                  KeyDown="TitleBox_KeyDown" />
 
-        <TextBlock Grid.Row="3" Text="Planned time (minutes)" Margin="0,0,0,6" />
+        <TextBlock Grid.Row="3" Text="Planned time (hours)" Margin="0,0,0,6" />
 
         <TextBox Grid.Row="4"
-                 x:Name="PlannedMinutesBox"
+                 x:Name="PlannedHoursBox"
                  Padding="8,6"
                  FontSize="14"
                  BorderBrush="#CCCCCC"
