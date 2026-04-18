@@ -1,3 +1,4 @@
+using HonestTimeTracker.Desktop.Features.Leaves;
 using HonestTimeTracker.Desktop.Features.Projects;
 using HonestTimeTracker.Desktop.Features.Records;
 using HonestTimeTracker.Desktop.Features.Settings;
@@ -49,6 +50,12 @@ public partial class MainWindow : Window
                 var todayPage = App.Services.GetRequiredService<TodayPage>();
                 MainContent.Content = todayPage;
                 await todayPage.InitializeAsync();
+                break;
+
+            case "Leave":
+                var leavePage = App.Services.GetRequiredService<LeavePage>();
+                MainContent.Content = leavePage;
+                await leavePage.InitializeAsync();
                 break;
 
             case "Settings":

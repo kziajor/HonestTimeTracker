@@ -36,6 +36,7 @@
                     <Button Style="{StaticResource NavButton}" Content="Projects" Tag="Projects" Click="NavButton_Click" />
                     <Button Style="{StaticResource NavButton}" Content="Tasks"    Tag="Tasks"    Click="NavButton_Click" />
                     <Button Style="{StaticResource NavButton}" Content="Records"  Tag="Records"  Click="NavButton_Click" />
+                    <Button Style="{StaticResource NavButton}" Content="Leave"    Tag="Leave"    Click="NavButton_Click" />
                     <Button Style="{StaticResource NavButton}" Content="Reports"  Tag="Reports"  Click="NavButton_Click" />
                     <Button Style="{StaticResource NavButton}" Content="Settings" Tag="Settings" Click="NavButton_Click" />
                 </StackPanel>

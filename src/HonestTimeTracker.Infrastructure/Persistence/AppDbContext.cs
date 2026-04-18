@@ -10,6 +10,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<WorkRecord> Records => Set<WorkRecord>();
     public DbSet<TfsCollection> TfsCollections => Set<TfsCollection>();
     public DbSet<AppSettings> Settings => Set<AppSettings>();
+    public DbSet<Leave> Leaves => Set<Leave>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -20,6 +21,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<WorkTask>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<WorkRecord>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<TfsCollection>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<Leave>().HasQueryFilter(e => !e.IsDeleted);
 
         modelBuilder.Entity<WorkRecord>()
             .HasOne(r => r.Task)

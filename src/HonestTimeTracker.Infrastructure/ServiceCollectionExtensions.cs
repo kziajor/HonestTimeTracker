@@ -1,5 +1,6 @@
 using FluentValidation;
 using HonestTimeTracker.Application;
+using HonestTimeTracker.Application.Leaves;
 using HonestTimeTracker.Application.Projects;
 using HonestTimeTracker.Application.Records;
 using HonestTimeTracker.Application.Settings;
@@ -22,6 +23,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IProjectRepository, ProjectRepository>();
         services.AddScoped<ITaskRepository, TaskRepository>();
         services.AddScoped<IRecordRepository, RecordRepository>();
+        services.AddScoped<ILeaveRepository, LeaveRepository>();
 
         services.AddScoped<IValidator<CreateProjectCommand>, CreateProjectCommandValidator>();
         services.AddScoped<IValidator<UpdateProjectCommand>, UpdateProjectCommandValidator>();
@@ -67,6 +69,16 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IValidator<UpdateSettingsCommand>, UpdateSettingsCommandValidator>();
         services.AddCommandHandler<UpdateSettingsCommand, UpdateSettingsCommandHandler, Unit>();
         services.AddScoped<IQueryHandler<GetSettingsQuery, SettingsDto>, GetSettingsQueryHandler>();
+
+        services.AddScoped<IValidator<CreateLeaveCommand>, CreateLeaveCommandValidator>();
+        services.AddScoped<IValidator<UpdateLeaveCommand>, UpdateLeaveCommandValidator>();
+        services.AddScoped<IValidator<DeleteLeaveCommand>, DeleteLeaveCommandValidator>();
+
+        services.AddCommandHandler<CreateLeaveCommand, CreateLeaveCommandHandler, int>();
+        services.AddCommandHandler<UpdateLeaveCommand, UpdateLeaveCommandHandler, Unit>();
+        services.AddCommandHandler<DeleteLeaveCommand, DeleteLeaveCommandHandler, Unit>();
+
+        services.AddScoped<IQueryHandler<GetLeavesQuery, List<LeaveDto>>, GetLeavesQueryHandler>();
 
         return services;
     }
