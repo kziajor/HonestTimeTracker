@@ -1,3 +1,4 @@
+using HonestTimeTracker.Desktop.Features.FloatingTimer;
 using HonestTimeTracker.Desktop.Features.Leaves;
 using HonestTimeTracker.Desktop.Features.Reports;
 using HonestTimeTracker.Desktop.Features.Projects;
@@ -5,6 +6,7 @@ using HonestTimeTracker.Desktop.Features.Records;
 using HonestTimeTracker.Desktop.Features.Settings;
 using HonestTimeTracker.Desktop.Features.Tasks;
 using HonestTimeTracker.Desktop.Features.Today;
+using HonestTimeTracker.Desktop.Services;
 using HonestTimeTracker.Infrastructure;
 using HonestTimeTracker.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -22,11 +24,15 @@ public partial class App : System.Windows.Application
     {
         base.OnStartup(e);
 
+
         var dbPath = GetDbPath();
         EnsureDbDirectory(dbPath);
 
         var services = new ServiceCollection();
         services.AddInfrastructure(dbPath);
+        services.AddSingleton<ITimerStateService, TimerStateService>();
+        services.AddSingleton<FloatingTimerViewModel>();
+        services.AddSingleton<FloatingTimerWindow>();
         services.AddSingleton<MainWindow>();
         services.AddTransient<ProjectsViewModel>();
         services.AddTransient<ProjectsPage>();
@@ -47,7 +53,19 @@ public partial class App : System.Windows.Application
 
         await MigrateDatabase();
 
-        Services.GetRequiredService<MainWindow>().Show();
+        var mainWindow = Services.GetRequiredService<MainWindow>();
+        MainWindow = mainWindow;
+        mainWindow.Show();
+
+        try
+        {
+            var floatingWindow = Services.GetRequiredService<FloatingTimerWindow>();
+            await floatingWindow.InitializeAsync();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[FloatingTimer] InitializeAsync failed: {ex}");
+        }
     }
 
     protected override void OnExit(ExitEventArgs e)

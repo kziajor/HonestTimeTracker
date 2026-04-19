@@ -8,6 +8,7 @@ public class UpdateSettingsCommandHandler(ISettingsRepository repository)
         var settings = await repository.GetAsync(ct);
         settings.DailyWorkHours = command.DailyWorkHours;
         settings.DefaultTaskPlannedHours = command.DefaultTaskPlannedHours;
+        settings.ShowFloatingTimer = command.ShowFloatingTimer;
         await repository.SaveChangesAsync(ct);
         return Unit.Value;
     }

@@ -46,6 +46,18 @@
                      BorderThickness="1"
                      Margin="0,0,0,32" />
 
+            <!-- Floating timer -->
+            <TextBlock Text="Floating timer window"
+                       FontWeight="SemiBold"
+                       Margin="0,0,0,4" />
+            <TextBlock Text="Show a compact always-on-top window while a timer is running."
+                       Foreground="#666666"
+                       FontSize="12"
+                       Margin="0,0,0,8" />
+            <CheckBox Content="Show floating timer"
+                      IsChecked="{Binding ShowFloatingTimer}"
+                      Margin="0,0,0,32" />
+
             <!-- Save button -->
             <Button Content="Save settings"
                     Width="140"

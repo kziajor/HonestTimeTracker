@@ -70,6 +70,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IValidator<UpdateSettingsCommand>, UpdateSettingsCommandValidator>();
         services.AddCommandHandler<UpdateSettingsCommand, UpdateSettingsCommandHandler, Unit>();
+        services.AddScoped<ICommandHandler<SaveFloatingTimerPositionCommand, Unit>, SaveFloatingTimerPositionCommandHandler>();
         services.AddScoped<IQueryHandler<GetSettingsQuery, SettingsDto>, GetSettingsQueryHandler>();
 
         services.AddScoped<IValidator<CreateLeaveCommand>, CreateLeaveCommandValidator>();
