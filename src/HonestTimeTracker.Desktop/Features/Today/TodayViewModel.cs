@@ -14,6 +14,7 @@ public class TodayViewModel : ViewModelBase
 {
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ITimerStateService _timerStateService;
+    private readonly ITimerStopService _timerStopService;
 
     public ObservableCollection<TaskDto> Tasks { get; } = [];
 
@@ -21,10 +22,11 @@ public class TodayViewModel : ViewModelBase
     public ICommand StartTimerCommand { get; }
     public ICommand StopTimerCommand { get; }
 
-    public TodayViewModel(IServiceScopeFactory scopeFactory, ITimerStateService timerStateService)
+    public TodayViewModel(IServiceScopeFactory scopeFactory, ITimerStateService timerStateService, ITimerStopService timerStopService)
     {
         _scopeFactory = scopeFactory;
         _timerStateService = timerStateService;
+        _timerStopService = timerStopService;
         RemoveFromTodayCommand = new AsyncRelayCommand(p => RemoveFromTodayAsync((TaskDto)p!), p => p is TaskDto);
         StartTimerCommand = new AsyncRelayCommand(p => StartTimerAsync((TaskDto)p!), p => p is TaskDto);
         StopTimerCommand = new AsyncRelayCommand(p => StopTimerAsync((TaskDto)p!), p => p is TaskDto);
@@ -102,17 +104,7 @@ public class TodayViewModel : ViewModelBase
 
     private async Task StopTimerAsync(TaskDto task)
     {
-        using var scope = _scopeFactory.CreateScope();
-        var handler = scope.ServiceProvider.GetRequiredService<ICommandHandler<StopTimerCommand, Unit>>();
-        try
-        {
-            await handler.HandleAsync(new StopTimerCommand());
-            _timerStateService.NotifyTimerStopped();
+        if (await _timerStopService.SafeStopAsync())
             await LoadAsync();
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
     }
 }

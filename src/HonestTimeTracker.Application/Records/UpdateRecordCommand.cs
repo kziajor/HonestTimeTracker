@@ -7,7 +7,7 @@ public record UpdateRecordCommand(
     int Id,
     int TaskId,
     DateTime StartedAt,
-    DateTime FinishedAt,
+    DateTime? FinishedAt,
     string? Comment) : ICommand<Unit>;
 
 public class UpdateRecordCommandValidator : AbstractValidator<UpdateRecordCommand>
@@ -17,12 +17,15 @@ public class UpdateRecordCommandValidator : AbstractValidator<UpdateRecordComman
         RuleFor(x => x.Id).GreaterThan(0);
         RuleFor(x => x.TaskId).GreaterThan(0);
         RuleFor(x => x.StartedAt).NotEmpty();
-        RuleFor(x => x.FinishedAt).NotEmpty();
-        RuleFor(x => x).Must(x => x.FinishedAt > x.StartedAt)
-            .WithMessage("End time must be after start time.");
-        RuleFor(x => x).Must(x => x.StartedAt.Date == x.FinishedAt.Date)
-            .WithMessage("Record must start and end on the same day.");
         RuleFor(x => x.Comment).MaximumLength(1000).When(x => x.Comment is not null);
+
+        When(x => x.FinishedAt.HasValue, () =>
+        {
+            RuleFor(x => x).Must(x => x.FinishedAt!.Value > x.StartedAt)
+                .WithMessage("End time must be after start time.");
+            RuleFor(x => x).Must(x => x.StartedAt.Date == x.FinishedAt!.Value.Date)
+                .WithMessage("Record must start and end on the same day.");
+        });
     }
 }
 
@@ -34,8 +37,17 @@ public class UpdateRecordCommandHandler(IRecordRepository recordRepository, ITas
         var record = await recordRepository.GetByIdAsync(command.Id, ct)
             ?? throw new InvalidOperationException($"Record with ID {command.Id} does not exist.");
 
+        if (!command.FinishedAt.HasValue)
+        {
+            var active = await recordRepository.GetActiveAsync(ct);
+            if (active is not null && active.Id != command.Id)
+                throw new InvalidOperationException("Another record is already running. Stop it before marking this one as running.");
+        }
+
         var oldMinutes = record.MinutesSpent;
-        var newMinutes = (int)(command.FinishedAt - command.StartedAt).TotalMinutes;
+        var newMinutes = command.FinishedAt.HasValue
+            ? (int)(command.FinishedAt.Value - command.StartedAt).TotalMinutes
+            : 0;
 
         if (record.TaskId != command.TaskId)
         {
@@ -43,9 +55,12 @@ public class UpdateRecordCommandHandler(IRecordRepository recordRepository, ITas
             if (oldTask is not null)
                 oldTask.SpentMinutes = Math.Max(0, oldTask.SpentMinutes - oldMinutes);
 
-            var newTask = await taskRepository.GetByIdAsync(command.TaskId, ct);
-            if (newTask is not null)
-                newTask.SpentMinutes += newMinutes;
+            if (command.FinishedAt.HasValue)
+            {
+                var newTask = await taskRepository.GetByIdAsync(command.TaskId, ct);
+                if (newTask is not null)
+                    newTask.SpentMinutes += newMinutes;
+            }
         }
         else
         {

@@ -73,6 +73,12 @@
                          BorderBrush="#CCCCCC"
                          BorderThickness="1"
                          MaxLength="5" />
+                <TextBlock x:Name="EndTimeHint"
+                           Text="Leave empty to start a running record"
+                           FontSize="11"
+                           Foreground="#888888"
+                           Margin="0,4,0,0"
+                           Visibility="Collapsed" />
             </StackPanel>
         </Grid>
 
@@ -99,7 +105,8 @@
                     Click="Cancel_Click" />
             <Button x:Name="OkButton"
                     Content="Save"
-                    Width="90"
+                    MinWidth="110"
+                    Padding="16,8"
                     Click="Ok_Click" />
         </StackPanel>
     </Grid>

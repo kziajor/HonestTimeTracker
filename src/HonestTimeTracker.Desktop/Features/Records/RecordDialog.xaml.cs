@@ -7,18 +7,26 @@ namespace HonestTimeTracker.Desktop.Features.Records;
 
 public partial class RecordDialog : Window
 {
+    private readonly bool _allowRunning;
+
     public int SelectedTaskId => ((TaskDto)TaskComboBox.SelectedItem).Id;
     public string? Comment => string.IsNullOrWhiteSpace(CommentBox.Text) ? null : CommentBox.Text.Trim();
 
     public DateTime StartedAt => CombineDateTime(DatePicker.SelectedDate!.Value, StartTimeBox.Text);
-    public DateTime FinishedAt => CombineDateTime(DatePicker.SelectedDate!.Value, EndTimeBox.Text);
+    public DateTime? FinishedAt => string.IsNullOrWhiteSpace(EndTimeBox.Text)
+        ? null
+        : CombineDateTime(DatePicker.SelectedDate!.Value, EndTimeBox.Text);
 
-    public RecordDialog(IEnumerable<TaskDto> tasks, RecordDto? existing = null)
+    public RecordDialog(IEnumerable<TaskDto> tasks, RecordDto? existing = null, bool allowRunning = false)
     {
         InitializeComponent();
+        _allowRunning = allowRunning;
 
         var taskList = tasks.ToList();
         TaskComboBox.ItemsSource = taskList;
+
+        if (allowRunning)
+            EndTimeHint.Visibility = Visibility.Visible;
 
         if (existing is not null)
         {
@@ -65,22 +73,35 @@ public partial class RecordDialog : Window
             return;
         }
 
-        if (!TryParseTime(EndTimeBox.Text, out _))
+        var endEmpty = string.IsNullOrWhiteSpace(EndTimeBox.Text);
+
+        if (endEmpty && !_allowRunning)
         {
-            MessageBox.Show("End time must be in HH:mm format (e.g. 17:00).", "Validation",
+            MessageBox.Show("End time is required. Another record is already running.", "Validation",
                 MessageBoxButton.OK, MessageBoxImage.Warning);
             EndTimeBox.Focus();
-            EndTimeBox.SelectAll();
             return;
         }
 
-        if (FinishedAt <= StartedAt)
+        if (!endEmpty)
         {
-            MessageBox.Show("End time must be after start time.", "Validation",
-                MessageBoxButton.OK, MessageBoxImage.Warning);
-            EndTimeBox.Focus();
-            EndTimeBox.SelectAll();
-            return;
+            if (!TryParseTime(EndTimeBox.Text, out _))
+            {
+                MessageBox.Show("End time must be in HH:mm format (e.g. 17:00).", "Validation",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                EndTimeBox.Focus();
+                EndTimeBox.SelectAll();
+                return;
+            }
+
+            if (FinishedAt <= StartedAt)
+            {
+                MessageBox.Show("End time must be after start time.", "Validation",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                EndTimeBox.Focus();
+                EndTimeBox.SelectAll();
+                return;
+            }
         }
 
         DialogResult = true;

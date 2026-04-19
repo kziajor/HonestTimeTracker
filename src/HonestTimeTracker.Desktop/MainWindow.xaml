@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         Title="Honest Time Tracker"
         Icon="pack://application:,,,/app.ico"
-        Height="680" Width="1200"
+        Height="680" Width="1300"
         MinHeight="480" MinWidth="800"
         WindowStartupLocation="CenterScreen">
 

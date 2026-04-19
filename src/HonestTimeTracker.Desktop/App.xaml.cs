@@ -31,6 +31,7 @@ public partial class App : System.Windows.Application
         var services = new ServiceCollection();
         services.AddInfrastructure(dbPath);
         services.AddSingleton<ITimerStateService, TimerStateService>();
+        services.AddSingleton<ITimerStopService, TimerStopService>();
         services.AddSingleton<FloatingTimerViewModel>();
         services.AddSingleton<FloatingTimerWindow>();
         services.AddSingleton<MainWindow>();

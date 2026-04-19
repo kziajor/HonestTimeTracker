@@ -7,6 +7,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -32,8 +33,88 @@
                         VerticalAlignment="Center" />
         </StackPanel>
 
-        <!-- Summary bar -->
+        <!-- Active record banner -->
         <Border Grid.Row="2"
+                Margin="0,0,0,12"
+                Padding="14,10"
+                Background="#1a1a1a"
+                CornerRadius="4"
+                Visibility="{Binding HasActiveRecord, Converter={StaticResource BoolToVisibility}}">
+            <DockPanel>
+                <!-- Actions -->
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+
+                    <!-- Edit active record -->
+                    <Button Style="{StaticResource IconButtonNeutral}"
+                            ToolTip="Edit record"
+                            Margin="0,0,6,0"
+                            Command="{Binding EditCommand}"
+                            CommandParameter="{Binding ActiveRecord}">
+                        <Viewbox Width="15" Height="15">
+                            <Canvas Width="24" Height="24">
+                                <Path Stroke="#444444" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"
+                                      Data="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                                <Path Stroke="#444444" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"
+                                      Data="M15 5l4 4"/>
+                            </Canvas>
+                        </Viewbox>
+                    </Button>
+
+                    <!-- Stop active record -->
+                    <Button Style="{StaticResource IconButtonDanger}"
+                            ToolTip="Stop timer"
+                            Command="{Binding StopTimerCommand}">
+                        <Viewbox Width="15" Height="15">
+                            <Canvas Width="24" Height="24">
+                                <Rectangle Canvas.Left="3" Canvas.Top="3" Width="18" Height="18" Fill="White" RadiusX="2" RadiusY="2"/>
+                            </Canvas>
+                        </Viewbox>
+                    </Button>
+
+                </StackPanel>
+
+                <!-- Pulsing indicator -->
+                <Ellipse Width="10" Height="10" Fill="#e74c3c" DockPanel.Dock="Left"
+                         VerticalAlignment="Center" Margin="0,0,10,0">
+                    <Ellipse.Triggers>
+                        <EventTrigger RoutedEvent="Loaded">
+                            <BeginStoryboard>
+                                <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                     From="1" To="0.2" Duration="0:0:0.8" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Ellipse.Triggers>
+                </Ellipse>
+
+                <!-- Task / project -->
+                <StackPanel DockPanel.Dock="Left" Margin="0,0,28,0">
+                    <TextBlock Text="Now tracking" FontSize="10" Foreground="#888888" FontWeight="SemiBold" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding ActiveTaskTitle}" FontSize="14" FontWeight="Bold" Foreground="White" />
+                        <TextBlock Text="{Binding ActiveProjectName, StringFormat=' · {0}'}"
+                                   FontSize="14" Foreground="#aaaaaa"
+                                   Visibility="{Binding ActiveProjectName, Converter={StaticResource NullOrEmptyToVisibility}}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Start time -->
+                <StackPanel DockPanel.Dock="Left" Margin="0,0,28,0">
+                    <TextBlock Text="Started" FontSize="10" Foreground="#888888" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding ActiveStartTime}" FontSize="14" FontWeight="Bold" Foreground="White" />
+                </StackPanel>
+
+                <!-- Elapsed -->
+                <StackPanel DockPanel.Dock="Left">
+                    <TextBlock Text="Elapsed" FontSize="10" Foreground="#888888" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding ActiveElapsed}" FontSize="14" FontWeight="Bold" Foreground="#fbcb18" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Summary bar -->
+        <Border Grid.Row="3"
                 Margin="0,0,0,12"
                 Padding="14,10"
                 Background="{StaticResource PrimaryBrush}"
@@ -92,7 +173,7 @@
         </Border>
 
         <!-- Records list -->
-        <Border Grid.Row="3" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4">
+        <Border Grid.Row="4" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4">
             <ListView x:Name="RecordsListView"
                       ItemsSource="{Binding Records}"
                       BorderThickness="0"
@@ -160,7 +241,7 @@
                         </GridViewColumn>
 
                         <!-- Actions -->
-                        <GridViewColumn Header="Actions" Width="90">
+                        <GridViewColumn Header="Actions" Width="120">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
@@ -187,10 +268,22 @@
                                             </Viewbox>
                                         </Button>
 
-                                        <!-- Edit — disabled for active (running) records -->
+                                        <!-- Stop — visible only for running records -->
+                                        <Button Style="{StaticResource IconButtonDanger}"
+                                                ToolTip="Stop timer"
+                                                Margin="0,0,4,0"
+                                                Visibility="{Binding FinishedAt, Converter={StaticResource NullToVisibility}}"
+                                                Command="{Binding DataContext.StopTimerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                            <Viewbox Width="15" Height="15">
+                                                <Canvas Width="24" Height="24">
+                                                    <Rectangle Canvas.Left="3" Canvas.Top="3" Width="18" Height="18" Fill="White" RadiusX="2" RadiusY="2"/>
+                                                </Canvas>
+                                            </Viewbox>
+                                        </Button>
+
+                                        <!-- Edit -->
                                         <Button Style="{StaticResource IconButtonNeutral}"
                                                 ToolTip="Edit"
-                                                IsEnabled="{Binding FinishedAt, Converter={StaticResource NullToBoolConverter}}"
                                                 Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}">
                                             <Viewbox Width="15" Height="15">

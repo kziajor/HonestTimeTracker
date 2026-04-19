@@ -3,6 +3,7 @@ using HonestTimeTracker.Application.Projects;
 using HonestTimeTracker.Application.Records;
 using HonestTimeTracker.Application.Tasks;
 using HonestTimeTracker.Desktop.Common;
+using HonestTimeTracker.Desktop.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -15,11 +16,38 @@ namespace HonestTimeTracker.Desktop.Features.Records;
 public class RecordsViewModel : ViewModelBase
 {
     private readonly IServiceScopeFactory _scopeFactory;
+    private readonly ITimerStateService _timerStateService;
+    private readonly ITimerStopService _timerStopService;
     private DateOnly _filterDate = DateOnly.FromDateTime(DateTime.Today);
     private bool _filterByDate = true;
     private RecordsSummaryDto? _summary;
+    private RecordDto? _activeRecord;
 
     public ObservableCollection<RecordDto> Records { get; } = [];
+
+    public RecordDto? ActiveRecord
+    {
+        get => _activeRecord;
+        private set
+        {
+            if (Set(ref _activeRecord, value))
+            {
+                OnPropertyChanged(nameof(HasActiveRecord));
+                OnPropertyChanged(nameof(ActiveTaskTitle));
+                OnPropertyChanged(nameof(ActiveProjectName));
+                OnPropertyChanged(nameof(ActiveStartTime));
+                OnPropertyChanged(nameof(ActiveElapsed));
+            }
+        }
+    }
+
+    public bool HasActiveRecord => _activeRecord != null;
+    public string ActiveTaskTitle => _activeRecord?.TaskTitle ?? "";
+    public string ActiveProjectName => _activeRecord?.ProjectName ?? "";
+    public string ActiveStartTime => _activeRecord != null ? _activeRecord.StartedAt.ToString("HH:mm") : "";
+    public string ActiveElapsed => _activeRecord != null
+        ? (DateTime.Now - _activeRecord.StartedAt).ToString(@"hh\:mm\:ss")
+        : "";
 
     public RecordsSummaryDto? Summary
     {
@@ -62,13 +90,17 @@ public class RecordsViewModel : ViewModelBase
     public ICommand AddCommand { get; }
     public ICommand EditCommand { get; }
     public ICommand DeleteCommand { get; }
+    public ICommand StopTimerCommand { get; }
 
-    public RecordsViewModel(IServiceScopeFactory scopeFactory)
+    public RecordsViewModel(IServiceScopeFactory scopeFactory, ITimerStateService timerStateService, ITimerStopService timerStopService)
     {
         _scopeFactory = scopeFactory;
+        _timerStateService = timerStateService;
+        _timerStopService = timerStopService;
         AddCommand = new AsyncRelayCommand(_ => AddAsync());
         EditCommand = new AsyncRelayCommand(p => EditAsync((RecordDto)p!), p => p is RecordDto);
         DeleteCommand = new AsyncRelayCommand(p => DeleteAsync((RecordDto)p!), p => p is RecordDto);
+        StopTimerCommand = new AsyncRelayCommand(_ => StopAsync());
     }
 
     public async Task LoadWithDateAsync(DateOnly date)
@@ -93,6 +125,18 @@ public class RecordsViewModel : ViewModelBase
         DateOnly? from = _filterByDate ? _filterDate : null;
         DateOnly? to = _filterByDate ? _filterDate : null;
         Summary = await summaryHandler.HandleAsync(new GetRecordsSummaryQuery(from, to));
+
+        var recordRepo = scope.ServiceProvider.GetRequiredService<IRecordRepository>();
+        var active = await recordRepo.GetActiveAsync(CancellationToken.None);
+        ActiveRecord = active is null ? null : new RecordDto(
+            active.Id,
+            active.TaskId,
+            active.Task.Title,
+            active.Task.Project?.Name,
+            active.StartedAt,
+            active.FinishedAt,
+            active.MinutesSpent,
+            active.Comment);
     }
 
     private async Task<List<TaskDto>> GetTasksAsync()
@@ -105,7 +149,8 @@ public class RecordsViewModel : ViewModelBase
     private async Task AddAsync()
     {
         var tasks = await GetTasksAsync();
-        var dialog = new RecordDialog(tasks) { Owner = WpfApp.Current.MainWindow };
+        var allowRunning = _activeRecord is null;
+        var dialog = new RecordDialog(tasks, allowRunning: allowRunning) { Owner = WpfApp.Current.MainWindow };
         if (dialog.ShowDialog() != true) return;
 
         using var scope = _scopeFactory.CreateScope();
@@ -117,6 +162,15 @@ public class RecordsViewModel : ViewModelBase
                 dialog.StartedAt,
                 dialog.FinishedAt,
                 dialog.Comment));
+
+            if (!dialog.FinishedAt.HasValue)
+            {
+                var task = tasks.FirstOrDefault(t => t.Id == dialog.SelectedTaskId);
+                if (task is not null)
+                    _timerStateService.NotifyTimerStarted(
+                        task.Id, task.Title, task.SpentMinutes, task.PlannedMinutes, dialog.StartedAt);
+            }
+
             await LoadAsync();
         }
         catch (Exception ex)
@@ -128,7 +182,10 @@ public class RecordsViewModel : ViewModelBase
     private async Task EditAsync(RecordDto record)
     {
         var tasks = await GetTasksAsync();
-        var dialog = new RecordDialog(tasks, record) { Owner = WpfApp.Current.MainWindow };
+        var allowRunning = _activeRecord is null || _activeRecord.Id == record.Id;
+        var wasRunning = !record.FinishedAt.HasValue;
+
+        var dialog = new RecordDialog(tasks, record, allowRunning) { Owner = WpfApp.Current.MainWindow };
         if (dialog.ShowDialog() != true) return;
 
         using var scope = _scopeFactory.CreateScope();
@@ -141,6 +198,27 @@ public class RecordsViewModel : ViewModelBase
                 dialog.StartedAt,
                 dialog.FinishedAt,
                 dialog.Comment));
+
+            var isNowRunning = !dialog.FinishedAt.HasValue;
+
+            if (wasRunning && !isNowRunning)
+            {
+                _timerStateService.NotifyTimerStopped();
+            }
+            else if (isNowRunning)
+            {
+                var task = tasks.FirstOrDefault(t => t.Id == dialog.SelectedTaskId);
+                if (task is not null)
+                {
+                    // For completed→running: handler subtracted old minutes from the task
+                    var previousSpent = wasRunning
+                        ? task.SpentMinutes
+                        : Math.Max(0, task.SpentMinutes - record.MinutesSpent);
+                    _timerStateService.NotifyTimerStarted(
+                        task.Id, task.Title, previousSpent, task.PlannedMinutes, dialog.StartedAt);
+                }
+            }
+
             await LoadAsync();
         }
         catch (Exception ex)
@@ -173,5 +251,11 @@ public class RecordsViewModel : ViewModelBase
         {
             MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
+    }
+
+    private async Task StopAsync()
+    {
+        if (await _timerStopService.SafeStopAsync())
+            await LoadAsync();
     }
 }
