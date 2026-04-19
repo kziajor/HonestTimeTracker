@@ -20,8 +20,8 @@ public class CreateRecordCommandValidator : AbstractValidator<CreateRecordComman
 
         When(x => x.FinishedAt.HasValue, () =>
         {
-            RuleFor(x => x).Must(x => x.FinishedAt!.Value > x.StartedAt)
-                .WithMessage("End time must be after start time.");
+            RuleFor(x => x).Must(x => x.FinishedAt!.Value >= x.StartedAt)
+                .WithMessage("End time cannot be before start time.");
             RuleFor(x => x).Must(x => x.StartedAt.Date == x.FinishedAt!.Value.Date)
                 .WithMessage("Record must start and end on the same day.");
         });
