@@ -9,6 +9,7 @@ public interface IRecordRepository
     Task<DateOnly?> GetEarliestDateAsync(CancellationToken ct);
     Task<WorkRecord?> GetByIdAsync(int id, CancellationToken ct);
     Task<WorkRecord?> GetActiveAsync(CancellationToken ct);
+    Task<bool> HasOverlapAsync(DateTime start, DateTime? end, int? excludeId, CancellationToken ct);
     Task AddAsync(WorkRecord record, CancellationToken ct);
     Task SaveChangesAsync(CancellationToken ct);
 }

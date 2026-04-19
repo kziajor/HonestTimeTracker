@@ -49,6 +49,17 @@ public class RecordRepository(AppDbContext db) : IRecordRepository
             .Include(r => r.Task)
             .FirstOrDefaultAsync(r => r.FinishedAt == null, ct);
 
+    public Task<bool> HasOverlapAsync(DateTime start, DateTime? end, int? excludeId, CancellationToken ct)
+    {
+        var newEnd = end ?? DateTime.MaxValue;
+        var query = db.Records.AsQueryable();
+        if (excludeId.HasValue)
+            query = query.Where(r => r.Id != excludeId.Value);
+        return query.AnyAsync(r =>
+            r.StartedAt < newEnd &&
+            (r.FinishedAt == null || r.FinishedAt.Value > start), ct);
+    }
+
     public async Task AddAsync(WorkRecord record, CancellationToken ct) =>
         await db.Records.AddAsync(record, ct);
 

@@ -8,6 +8,7 @@ namespace HonestTimeTracker.Desktop.Features.Records;
 public partial class RecordDialog : Window
 {
     private readonly bool _allowRunning;
+    private readonly Func<DateTime, DateTime?, Task<bool>>? _overlapChecker;
 
     public int SelectedTaskId => ((TaskDto)TaskComboBox.SelectedItem).Id;
     public string? Comment => string.IsNullOrWhiteSpace(CommentBox.Text) ? null : CommentBox.Text.Trim();
@@ -17,10 +18,11 @@ public partial class RecordDialog : Window
         ? null
         : CombineDateTime(DatePicker.SelectedDate!.Value, EndTimeBox.Text);
 
-    public RecordDialog(IEnumerable<TaskDto> tasks, RecordDto? existing = null, bool allowRunning = false)
+    public RecordDialog(IEnumerable<TaskDto> tasks, RecordDto? existing = null, DateTime? defaultDate = null, bool allowRunning = false, Func<DateTime, DateTime?, Task<bool>>? overlapChecker = null)
     {
         InitializeComponent();
         _allowRunning = allowRunning;
+        _overlapChecker = overlapChecker;
 
         var taskList = tasks.ToList();
         TaskComboBox.ItemsSource = taskList;
@@ -41,14 +43,14 @@ public partial class RecordDialog : Window
         else
         {
             var now = DateTime.Now;
-            DatePicker.SelectedDate = now.Date;
+            DatePicker.SelectedDate = (defaultDate ?? now).Date;
             StartTimeBox.Text = now.ToString("HH:mm");
         }
 
         Loaded += (_, _) => TaskComboBox.Focus();
     }
 
-    private void Ok_Click(object sender, RoutedEventArgs e)
+    private async void Ok_Click(object sender, RoutedEventArgs e)
     {
         if (TaskComboBox.SelectedItem is null)
         {
@@ -102,6 +104,15 @@ public partial class RecordDialog : Window
                 EndTimeBox.SelectAll();
                 return;
             }
+        }
+
+        if (_overlapChecker is not null && await _overlapChecker(StartedAt, FinishedAt))
+        {
+            MessageBox.Show("The time range overlaps with an existing record.", "Validation",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+            StartTimeBox.Focus();
+            StartTimeBox.SelectAll();
+            return;
         }
 
         DialogResult = true;

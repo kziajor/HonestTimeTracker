@@ -44,6 +44,9 @@ public class UpdateRecordCommandHandler(IRecordRepository recordRepository, ITas
                 throw new InvalidOperationException("Another record is already running. Stop it before marking this one as running.");
         }
 
+        if (await recordRepository.HasOverlapAsync(command.StartedAt, command.FinishedAt, excludeId: command.Id, ct))
+            throw new InvalidOperationException("The time range overlaps with an existing record.");
+
         var oldMinutes = record.MinutesSpent;
         var newMinutes = command.FinishedAt.HasValue
             ? (int)(command.FinishedAt.Value - command.StartedAt).TotalMinutes

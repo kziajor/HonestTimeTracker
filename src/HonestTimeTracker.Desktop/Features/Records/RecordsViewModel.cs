@@ -150,7 +150,14 @@ public class RecordsViewModel : ViewModelBase
     {
         var tasks = await GetTasksAsync();
         var allowRunning = _activeRecord is null;
-        var dialog = new RecordDialog(tasks, allowRunning: allowRunning) { Owner = WpfApp.Current.MainWindow };
+        var defaultDate = _filterByDate ? (DateTime?)_filterDate.ToDateTime(TimeOnly.MinValue) : null;
+        Func<DateTime, DateTime?, Task<bool>> overlapChecker = async (start, end) =>
+        {
+            using var s = _scopeFactory.CreateScope();
+            var repo = s.ServiceProvider.GetRequiredService<IRecordRepository>();
+            return await repo.HasOverlapAsync(start, end, null, CancellationToken.None);
+        };
+        var dialog = new RecordDialog(tasks, defaultDate: defaultDate, allowRunning: allowRunning, overlapChecker: overlapChecker) { Owner = WpfApp.Current.MainWindow };
         if (dialog.ShowDialog() != true) return;
 
         using var scope = _scopeFactory.CreateScope();
@@ -184,8 +191,14 @@ public class RecordsViewModel : ViewModelBase
         var tasks = await GetTasksAsync();
         var allowRunning = _activeRecord is null || _activeRecord.Id == record.Id;
         var wasRunning = !record.FinishedAt.HasValue;
-
-        var dialog = new RecordDialog(tasks, record, allowRunning) { Owner = WpfApp.Current.MainWindow };
+        var recordId = record.Id;
+        Func<DateTime, DateTime?, Task<bool>> overlapChecker = async (start, end) =>
+        {
+            using var s = _scopeFactory.CreateScope();
+            var repo = s.ServiceProvider.GetRequiredService<IRecordRepository>();
+            return await repo.HasOverlapAsync(start, end, recordId, CancellationToken.None);
+        };
+        var dialog = new RecordDialog(tasks, record, allowRunning: allowRunning, overlapChecker: overlapChecker) { Owner = WpfApp.Current.MainWindow };
         if (dialog.ShowDialog() != true) return;
 
         using var scope = _scopeFactory.CreateScope();

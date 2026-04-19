@@ -40,6 +40,9 @@ public class CreateRecordCommandHandler(IRecordRepository recordRepository, ITas
                 throw new InvalidOperationException("Another record is already running. Stop it before starting a new one.");
         }
 
+        if (await recordRepository.HasOverlapAsync(command.StartedAt, command.FinishedAt, excludeId: null, ct))
+            throw new InvalidOperationException("The time range overlaps with an existing record.");
+
         var minutesSpent = command.FinishedAt.HasValue
             ? (int)(command.FinishedAt.Value - command.StartedAt).TotalMinutes
             : 0;
