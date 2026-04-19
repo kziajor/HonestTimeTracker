@@ -91,6 +91,8 @@ public class RecordsViewModel : ViewModelBase
     public ICommand EditCommand { get; }
     public ICommand DeleteCommand { get; }
     public ICommand StopTimerCommand { get; }
+    public ICommand PreviousDayCommand { get; }
+    public ICommand NextDayCommand { get; }
 
     public RecordsViewModel(IServiceScopeFactory scopeFactory, ITimerStateService timerStateService, ITimerStopService timerStopService)
     {
@@ -101,6 +103,8 @@ public class RecordsViewModel : ViewModelBase
         EditCommand = new AsyncRelayCommand(p => EditAsync((RecordDto)p!), p => p is RecordDto);
         DeleteCommand = new AsyncRelayCommand(p => DeleteAsync((RecordDto)p!), p => p is RecordDto);
         StopTimerCommand = new AsyncRelayCommand(_ => StopAsync());
+        PreviousDayCommand = new RelayCommand(_ => FilterDate = FilterDate.AddDays(-1), _ => FilterByDate);
+        NextDayCommand = new RelayCommand(_ => FilterDate = FilterDate.AddDays(1), _ => FilterByDate);
     }
 
     public async Task LoadWithDateAsync(DateOnly date)

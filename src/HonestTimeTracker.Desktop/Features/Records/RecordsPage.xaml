@@ -26,11 +26,35 @@
                       IsChecked="{Binding FilterByDate}"
                       VerticalAlignment="Center"
                       Margin="0,0,12,0" />
+            <Button Style="{StaticResource IconButtonNeutral}"
+                    Command="{Binding PreviousDayCommand}"
+                    ToolTip="Previous day"
+                    Margin="0,0,4,0"
+                    VerticalAlignment="Center">
+                <Viewbox Width="15" Height="15">
+                    <Canvas Width="24" Height="24">
+                        <Path Stroke="#444444" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"
+                              Data="M15 18l-6-6 6-6"/>
+                    </Canvas>
+                </Viewbox>
+            </Button>
             <DatePicker x:Name="FilterDatePicker"
                         SelectedDate="{Binding FilterDate, Converter={StaticResource DateOnlyConverter}}"
                         IsEnabled="{Binding FilterByDate}"
                         FontSize="13"
                         VerticalAlignment="Center" />
+            <Button Style="{StaticResource IconButtonNeutral}"
+                    Command="{Binding NextDayCommand}"
+                    ToolTip="Next day"
+                    Margin="4,0,0,0"
+                    VerticalAlignment="Center">
+                <Viewbox Width="15" Height="15">
+                    <Canvas Width="24" Height="24">
+                        <Path Stroke="#444444" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent"
+                              Data="M9 18l6-6-6-6"/>
+                    </Canvas>
+                </Viewbox>
+            </Button>
         </StackPanel>
 
         <!-- Active record banner -->
