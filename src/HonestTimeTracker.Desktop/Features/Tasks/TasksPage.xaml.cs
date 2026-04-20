@@ -19,10 +19,12 @@ public partial class TasksPage : UserControl
 
     private void UpdateTitleColumnWidth()
     {
-        const double fixedWidth = 160 + 90 + 120 + 110 + 140; // Projekt + Plan + Spędzony + Status + Akcje
-        var available = TaskListView.ActualWidth - fixedWidth - 26;
-        if (available > 80)
-            TitleColumn.Width = available;
+        // Fixed: TFS ID(70) + Plan(70) + Spent(70) + Status(75) + Actions(130) + scrollbar/border(26)
+        const double fixedWidth = 70 + 70 + 70 + 75 + 130 + 26;
+        var available = TaskListView.ActualWidth - fixedWidth;
+        if (available < 120) return;
+        TitleColumn.Width = Math.Round(available * 0.60);
+        ProjectColumn.Width = Math.Round(available * 0.40);
     }
 
     private void MoreActions_Click(object sender, RoutedEventArgs e)

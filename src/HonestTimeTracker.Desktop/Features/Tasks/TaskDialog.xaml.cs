@@ -9,8 +9,9 @@ public partial class TaskDialog : Window
     public string TaskTitle => TitleBox.Text.Trim();
     public int PlannedMinutes { get; private set; }
     public int ProjectId => ((ProjectDto)ProjectComboBox.SelectedItem).Id;
+    public int? TfsWorkItemId { get; private set; }
 
-    public TaskDialog(IEnumerable<ProjectDto> projects, string? existingTitle = null, int existingPlannedMinutes = 0, int? existingProjectId = null, double? defaultPlannedHours = null)
+    public TaskDialog(IEnumerable<ProjectDto> projects, string? existingTitle = null, int existingPlannedMinutes = 0, int? existingProjectId = null, double? defaultPlannedHours = null, int? existingTfsWorkItemId = null)
     {
         InitializeComponent();
 
@@ -31,6 +32,9 @@ public partial class TaskDialog : Window
         {
             PlannedHoursBox.Text = defaultPlannedHours.Value.ToString(System.Globalization.CultureInfo.CurrentCulture);
         }
+
+        if (existingTfsWorkItemId.HasValue)
+            TfsWorkItemIdBox.Text = existingTfsWorkItemId.Value.ToString();
 
         Loaded += (_, _) =>
         {
@@ -66,6 +70,23 @@ public partial class TaskDialog : Window
                 MessageBoxButton.OK, MessageBoxImage.Warning);
             ProjectComboBox.Focus();
             return;
+        }
+
+        var tfsText = TfsWorkItemIdBox.Text.Trim();
+        if (!string.IsNullOrEmpty(tfsText))
+        {
+            if (!int.TryParse(tfsText, out var tfsId) || tfsId <= 0)
+            {
+                MessageBox.Show("TFS Work Item ID must be a positive integer.", "Validation",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                TfsWorkItemIdBox.Focus();
+                return;
+            }
+            TfsWorkItemId = tfsId;
+        }
+        else
+        {
+            TfsWorkItemId = null;
         }
 
         DialogResult = true;

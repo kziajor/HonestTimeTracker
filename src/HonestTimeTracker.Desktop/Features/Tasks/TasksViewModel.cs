@@ -84,7 +84,7 @@ public class TasksViewModel : ViewModelBase
         var handler = scope.ServiceProvider.GetRequiredService<ICommandHandler<CreateTaskCommand, int>>();
         try
         {
-            await handler.HandleAsync(new CreateTaskCommand(dialog.TaskTitle, dialog.PlannedMinutes, dialog.ProjectId));
+            await handler.HandleAsync(new CreateTaskCommand(dialog.TaskTitle, dialog.PlannedMinutes, dialog.ProjectId, dialog.TfsWorkItemId));
             await LoadAsync();
         }
         catch (Exception ex)
@@ -96,7 +96,7 @@ public class TasksViewModel : ViewModelBase
     private async Task EditAsync(TaskDto task)
     {
         var projects = await GetProjectsAsync();
-        var dialog = new TaskDialog(projects, task.Title, task.PlannedMinutes, task.ProjectId)
+        var dialog = new TaskDialog(projects, task.Title, task.PlannedMinutes, task.ProjectId, existingTfsWorkItemId: task.TfsWorkItemId)
         {
             Owner = System.Windows.Application.Current.MainWindow
         };
@@ -106,7 +106,7 @@ public class TasksViewModel : ViewModelBase
         var handler = scope.ServiceProvider.GetRequiredService<ICommandHandler<UpdateTaskCommand, Unit>>();
         try
         {
-            await handler.HandleAsync(new UpdateTaskCommand(task.Id, dialog.TaskTitle, dialog.PlannedMinutes, dialog.ProjectId));
+            await handler.HandleAsync(new UpdateTaskCommand(task.Id, dialog.TaskTitle, dialog.PlannedMinutes, dialog.ProjectId, dialog.TfsWorkItemId));
             await LoadAsync();
         }
         catch (Exception ex)

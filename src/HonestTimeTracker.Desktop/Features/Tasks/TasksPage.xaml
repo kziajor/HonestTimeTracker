@@ -34,6 +34,15 @@
                 <ListView.View>
                     <GridView>
 
+                        <!-- TFS ID -->
+                        <GridViewColumn Header="TFS ID" Width="70">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding TfsWorkItemId}" HorizontalAlignment="Right" Foreground="#555555" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
                         <!-- Title -->
                         <GridViewColumn x:Name="TitleColumn" Header="Title" Width="280">
                             <GridViewColumn.CellTemplate>
@@ -55,7 +64,7 @@
                         </GridViewColumn>
 
                         <!-- Project -->
-                        <GridViewColumn Header="Project" Width="160">
+                        <GridViewColumn x:Name="ProjectColumn" Header="Project" Width="160">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding ProjectName}" Foreground="#555555" />
@@ -64,7 +73,7 @@
                         </GridViewColumn>
 
                         <!-- Planned time -->
-                        <GridViewColumn Header="Plan (h)" Width="90">
+                        <GridViewColumn Header="Plan (h)" Width="70">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding PlannedMinutes, Converter={StaticResource MinutesToHours}}" HorizontalAlignment="Right" />
@@ -73,7 +82,7 @@
                         </GridViewColumn>
 
                         <!-- Spent time -->
-                        <GridViewColumn Header="Spent (h)" Width="120">
+                        <GridViewColumn Header="Spent (h)" Width="70">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding SpentMinutes, Converter={StaticResource MinutesToHours}}" HorizontalAlignment="Right" />
@@ -82,7 +91,7 @@
                         </GridViewColumn>
 
                         <!-- Status -->
-                        <GridViewColumn Header="Status" Width="110">
+                        <GridViewColumn Header="Status" Width="75">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <Border CornerRadius="3" Padding="6,2">
@@ -118,7 +127,7 @@
                         </GridViewColumn>
 
                         <!-- Actions -->
-                        <GridViewColumn Header="Actions" Width="140">
+                        <GridViewColumn Header="Actions" Width="130">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">

@@ -11,6 +11,7 @@ public class UpdateTaskCommandHandler(ITaskRepository repository)
         task.Title = command.Title.Trim();
         task.PlannedMinutes = command.PlannedMinutes;
         task.ProjectId = (int?)command.ProjectId;
+        task.TfsWorkItemId = command.TfsWorkItemId;
         await repository.SaveChangesAsync(ct);
         return Unit.Value;
     }

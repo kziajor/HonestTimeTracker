@@ -16,6 +16,8 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0"
@@ -55,11 +57,21 @@
                   FontSize="14"
                   BorderBrush="#CCCCCC"
                   BorderThickness="1"
-                  Margin="0,0,0,20"
+                  Margin="0,0,0,16"
                   DisplayMemberPath="Name"
                   SelectedValuePath="Id" />
 
-        <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Right">
+        <TextBlock Grid.Row="7" Text="TFS Work Item ID (optional)" Margin="0,0,0,6" />
+
+        <TextBox Grid.Row="8"
+                 x:Name="TfsWorkItemIdBox"
+                 Padding="8,6"
+                 FontSize="14"
+                 BorderBrush="#CCCCCC"
+                 BorderThickness="1"
+                 Margin="0,0,0,20" />
+
+        <StackPanel Grid.Row="9" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Cancel"
                     Width="90"
                     Background="#E0E0E0"

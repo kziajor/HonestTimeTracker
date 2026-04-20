@@ -11,7 +11,8 @@ public class CreateTaskCommandHandler(ITaskRepository repository)
         {
             Title = command.Title.Trim(),
             PlannedMinutes = command.PlannedMinutes,
-            ProjectId = (int?)command.ProjectId
+            ProjectId = (int?)command.ProjectId,
+            TfsWorkItemId = command.TfsWorkItemId
         };
         await repository.AddAsync(task, ct);
         await repository.SaveChangesAsync(ct);

@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace HonestTimeTracker.Application.Tasks;
 
-public record CreateTaskCommand(string Title, int PlannedMinutes, int ProjectId) : ICommand<int>;
+public record CreateTaskCommand(string Title, int PlannedMinutes, int ProjectId, int? TfsWorkItemId = null) : ICommand<int>;
 
 public class CreateTaskCommandValidator : AbstractValidator<CreateTaskCommand>
 {

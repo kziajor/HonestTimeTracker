@@ -20,7 +20,7 @@ public class GetTasksQueryHandler(ITaskRepository repository, IRecordRepository 
         var tasks = await repository.GetAllAsync(query.ShowClosed, query.ProjectId, ct);
         var activeRecord = await recordRepository.GetActiveAsync(ct);
         return tasks
-            .Select(t => new TaskDto(t.Id, t.Title, t.PlannedMinutes, t.SpentMinutes, t.Closed, t.ProjectId, t.Project?.Name,
+            .Select(t => new TaskDto(t.Id, t.TfsWorkItemId, t.Title, t.PlannedMinutes, t.SpentMinutes, t.Closed, t.ProjectId, t.Project?.Name,
                 HasActiveTimer: activeRecord?.TaskId == t.Id,
                 IsOnTodayList: t.IsOnTodayList))
             .ToList();
