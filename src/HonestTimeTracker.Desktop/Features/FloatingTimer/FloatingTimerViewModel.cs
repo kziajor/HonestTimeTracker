@@ -115,7 +115,7 @@ public class FloatingTimerViewModel : ViewModelBase
             _previousSpentMinutes = activeRecord.Task.SpentMinutes;
             _plannedMinutes = activeRecord.Task.PlannedMinutes;
             _startedAt = activeRecord.StartedAt;
-            _taskTitle = activeRecord.Task.Title;
+            TaskTitle = activeRecord.Task.Title;
             SetTimerActive(true);
         }
         else
@@ -126,7 +126,7 @@ public class FloatingTimerViewModel : ViewModelBase
 
     private void OnTimerStarted(object? sender, TimerStartedEventArgs e)
     {
-        _taskTitle = e.TaskTitle;
+        TaskTitle = e.TaskTitle;
         _previousSpentMinutes = e.PreviousSpentMinutes;
         _plannedMinutes = e.PlannedMinutes;
         _startedAt = e.StartedAt;
