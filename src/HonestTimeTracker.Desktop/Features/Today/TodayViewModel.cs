@@ -93,7 +93,7 @@ public class TodayViewModel : ViewModelBase
         try
         {
             await handler.HandleAsync(new StartTimerCommand(task.Id));
-            _timerStateService.NotifyTimerStarted(task.Id, task.Title, task.SpentMinutes, task.PlannedMinutes, DateTime.Now);
+            _timerStateService.NotifyTimerStarted(task.Id, task.Title, task.SpentMinutes, task.PlannedMinutes, DateTime.Now, task.TfsWorkItemId);
             await LoadAsync();
         }
         catch (Exception ex)

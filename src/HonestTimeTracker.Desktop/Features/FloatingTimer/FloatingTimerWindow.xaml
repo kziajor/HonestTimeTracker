@@ -28,13 +28,15 @@
 
         <StackPanel>
 
-            <!-- Task title -->
+            <!-- Task title: wraps up to 2 lines, then clips -->
             <TextBlock Text="{Binding TaskTitle}"
                        FontWeight="SemiBold"
                        FontSize="13"
                        Foreground="#000000"
+                       TextWrapping="Wrap"
                        TextTrimming="CharacterEllipsis"
                        MaxWidth="272"
+                       MaxHeight="36"
                        Margin="0,0,0,8" />
 
             <!-- Spent / Planned -->
@@ -127,36 +129,47 @@
             </StackPanel>
 
             <!-- Diff row -->
-            <StackPanel Orientation="Horizontal"
-                        Margin="0,6,0,0"
-                        Visibility="{Binding IsDiffVisible, Converter={StaticResource BoolToVisibility}}">
+            <Grid Margin="0,6,0,0"
+                  Visibility="{Binding IsDiffVisible, Converter={StaticResource BoolToVisibility}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-                <TextBlock FontSize="11"
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock FontSize="11"
+                               Foreground="#5a3e00"
+                               Text="Diff: " />
+
+                    <TextBlock Text="{Binding DiffText}"
+                               FontWeight="SemiBold"
+                               FontSize="11">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                <Setter Property="Foreground" Value="#1a7a1a" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsOvertime}" Value="True">
+                                        <Setter Property="Foreground" Value="#cc0000" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <TextBlock FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="#cc0000"
+                               Text=" ⚠ overtime"
+                               Visibility="{Binding IsOvertime, Converter={StaticResource BoolToVisibility}}" />
+                </StackPanel>
+
+                <TextBlock Grid.Column="1"
+                           Text="{Binding TfsWorkItemText}"
+                           FontSize="10"
                            Foreground="#5a3e00"
-                           Text="Diff: " />
-
-                <TextBlock Text="{Binding DiffText}"
-                           FontWeight="SemiBold"
-                           FontSize="11">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
-                            <Setter Property="Foreground" Value="#1a7a1a" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsOvertime}" Value="True">
-                                    <Setter Property="Foreground" Value="#cc0000" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-
-                <TextBlock FontSize="11"
-                           FontWeight="SemiBold"
-                           Foreground="#cc0000"
-                           Text=" ⚠ overtime"
-                           Visibility="{Binding IsOvertime, Converter={StaticResource BoolToVisibility}}" />
-
-            </StackPanel>
+                           VerticalAlignment="Center"
+                           Visibility="{Binding IsTfsVisible, Converter={StaticResource BoolToVisibility}}" />
+            </Grid>
 
         </StackPanel>
     </Border>

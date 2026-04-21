@@ -179,7 +179,7 @@ public class RecordsViewModel : ViewModelBase
                 var task = tasks.FirstOrDefault(t => t.Id == dialog.SelectedTaskId);
                 if (task is not null)
                     _timerStateService.NotifyTimerStarted(
-                        task.Id, task.Title, task.SpentMinutes, task.PlannedMinutes, dialog.StartedAt);
+                        task.Id, task.Title, task.SpentMinutes, task.PlannedMinutes, dialog.StartedAt, task.TfsWorkItemId);
             }
 
             await LoadAsync();
@@ -232,7 +232,7 @@ public class RecordsViewModel : ViewModelBase
                         ? task.SpentMinutes
                         : Math.Max(0, task.SpentMinutes - record.MinutesSpent);
                     _timerStateService.NotifyTimerStarted(
-                        task.Id, task.Title, previousSpent, task.PlannedMinutes, dialog.StartedAt);
+                        task.Id, task.Title, previousSpent, task.PlannedMinutes, dialog.StartedAt, task.TfsWorkItemId);
                 }
             }
 

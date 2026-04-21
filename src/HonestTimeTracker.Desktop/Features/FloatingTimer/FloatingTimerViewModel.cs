@@ -24,12 +24,25 @@ public class FloatingTimerViewModel : ViewModelBase
     private string _plannedText = string.Empty;
     private string _diffText = string.Empty;
     private bool _isOvertime;
+    private string _tfsWorkItemText = string.Empty;
 
     public string TaskTitle
     {
         get => _taskTitle;
         private set => Set(ref _taskTitle, value);
     }
+
+    public string TfsWorkItemText
+    {
+        get => _tfsWorkItemText;
+        private set
+        {
+            if (Set(ref _tfsWorkItemText, value))
+                OnPropertyChanged(nameof(IsTfsVisible));
+        }
+    }
+
+    public bool IsTfsVisible => !string.IsNullOrEmpty(_tfsWorkItemText);
 
     public string TotalSpentText
     {
@@ -116,6 +129,7 @@ public class FloatingTimerViewModel : ViewModelBase
             _plannedMinutes = activeRecord.Task.PlannedMinutes;
             _startedAt = activeRecord.StartedAt;
             TaskTitle = activeRecord.Task.Title;
+            TfsWorkItemText = activeRecord.Task.TfsWorkItemId.HasValue ? $"TFS #{activeRecord.Task.TfsWorkItemId}" : string.Empty;
             SetTimerActive(true);
         }
         else
@@ -130,6 +144,7 @@ public class FloatingTimerViewModel : ViewModelBase
         _previousSpentMinutes = e.PreviousSpentMinutes;
         _plannedMinutes = e.PlannedMinutes;
         _startedAt = e.StartedAt;
+        TfsWorkItemText = e.TfsWorkItemId.HasValue ? $"TFS #{e.TfsWorkItemId}" : string.Empty;
         SetTimerActive(true);
     }
 
@@ -154,6 +169,7 @@ public class FloatingTimerViewModel : ViewModelBase
             DiffText = string.Empty;
             IsOvertime = false;
             TaskTitle = string.Empty;
+            TfsWorkItemText = string.Empty;
             ProgressPercent = 0;
             ProgressPercentText = string.Empty;
         }
