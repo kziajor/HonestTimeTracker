@@ -19,16 +19,31 @@
         </DockPanel>
 
         <!-- Filter row -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
+        <WrapPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
             <CheckBox Content="Show closed tasks"
                       IsChecked="{Binding ShowClosed}"
-                      VerticalAlignment="Center" />
-        </StackPanel>
+                      VerticalAlignment="Center"
+                      Margin="0,0,24,0" />
+            <StackPanel Orientation="Horizontal" Margin="0,0,16,0" VerticalAlignment="Center">
+                <TextBlock Text="Title:" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#555555" />
+                <TextBox Text="{Binding TitleFilter, UpdateSourceTrigger=PropertyChanged}"
+                         Width="180"
+                         Padding="6,4"
+                         VerticalAlignment="Center" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="TFS ID:" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#555555" />
+                <TextBox Text="{Binding TfsIdFilter, UpdateSourceTrigger=PropertyChanged}"
+                         Width="80"
+                         Padding="6,4"
+                         VerticalAlignment="Center" />
+            </StackPanel>
+        </WrapPanel>
 
         <!-- Task list -->
         <Border Grid.Row="2" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4">
             <ListView x:Name="TaskListView"
-                      ItemsSource="{Binding Tasks}"
+                      ItemsSource="{Binding TasksView}"
                       BorderThickness="0"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListView.View>

@@ -7,7 +7,9 @@ using HonestTimeTracker.Desktop.Common;
 using HonestTimeTracker.Desktop.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace HonestTimeTracker.Desktop.Features.Tasks;
@@ -18,13 +20,28 @@ public class TasksViewModel : ViewModelBase
     private readonly ITimerStateService _timerStateService;
     private readonly ITimerStopService _timerStopService;
     private bool _showClosed = false;
+    private string _titleFilter = string.Empty;
+    private string _tfsIdFilter = string.Empty;
 
     public ObservableCollection<TaskDto> Tasks { get; } = [];
+    public ICollectionView TasksView { get; }
 
     public bool ShowClosed
     {
         get => _showClosed;
         set { if (Set(ref _showClosed, value)) _ = LoadAsync(); }
+    }
+
+    public string TitleFilter
+    {
+        get => _titleFilter;
+        set { if (Set(ref _titleFilter, value)) TasksView.Refresh(); }
+    }
+
+    public string TfsIdFilter
+    {
+        get => _tfsIdFilter;
+        set { if (Set(ref _tfsIdFilter, value)) TasksView.Refresh(); }
     }
 
     public ICommand AddCommand { get; }
@@ -40,6 +57,10 @@ public class TasksViewModel : ViewModelBase
         _scopeFactory = scopeFactory;
         _timerStateService = timerStateService;
         _timerStopService = timerStopService;
+
+        TasksView = CollectionViewSource.GetDefaultView(Tasks);
+        TasksView.Filter = FilterTask;
+
         AddCommand = new AsyncRelayCommand(_ => AddAsync());
         EditCommand = new AsyncRelayCommand(p => EditAsync((TaskDto)p!), p => p is TaskDto);
         DeleteCommand = new AsyncRelayCommand(p => DeleteAsync((TaskDto)p!), p => p is TaskDto);
@@ -47,6 +68,19 @@ public class TasksViewModel : ViewModelBase
         ToggleTodayListCommand = new AsyncRelayCommand(p => ToggleTodayListAsync((TaskDto)p!), p => p is TaskDto);
         StartTimerCommand = new AsyncRelayCommand(p => StartTimerAsync((TaskDto)p!), p => p is TaskDto);
         StopTimerCommand = new AsyncRelayCommand(p => StopTimerAsync((TaskDto)p!), p => p is TaskDto);
+    }
+
+    private bool FilterTask(object obj)
+    {
+        if (obj is not TaskDto task) return false;
+        if (!string.IsNullOrWhiteSpace(_titleFilter) &&
+            !task.Title.Contains(_titleFilter, StringComparison.OrdinalIgnoreCase))
+            return false;
+        if (!string.IsNullOrWhiteSpace(_tfsIdFilter) &&
+            int.TryParse(_tfsIdFilter, out var id) &&
+            task.TfsWorkItemId != id)
+            return false;
+        return true;
     }
 
     public async Task LoadAsync()
