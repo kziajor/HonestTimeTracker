@@ -8,4 +8,5 @@ public record RecordDto(
     DateTime StartedAt,
     DateTime? FinishedAt,
     int MinutesSpent,
-    string? Comment);
+    string? Comment,
+    bool TaskClosed);

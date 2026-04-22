@@ -37,7 +37,8 @@ public class TimerStopService(IServiceScopeFactory scopeFactory, ITimerStateServ
                 active.StartedAt,
                 active.FinishedAt,
                 active.MinutesSpent,
-                active.Comment);
+                active.Comment,
+                active.Task.Closed);
 
             var dialog = new RecordDialog(tasks, activeDto, allowRunning: false)
             {

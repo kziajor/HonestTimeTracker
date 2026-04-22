@@ -100,7 +100,7 @@ public class RecordsViewModel : ViewModelBase
         _timerStateService = timerStateService;
         _timerStopService = timerStopService;
         AddCommand = new AsyncRelayCommand(_ => AddAsync());
-        EditCommand = new AsyncRelayCommand(p => EditAsync((RecordDto)p!), p => p is RecordDto);
+        EditCommand = new AsyncRelayCommand(p => EditAsync((RecordDto)p!), p => p is RecordDto r && !r.TaskClosed);
         DeleteCommand = new AsyncRelayCommand(p => DeleteAsync((RecordDto)p!), p => p is RecordDto);
         StopTimerCommand = new AsyncRelayCommand(_ => StopAsync());
         PreviousDayCommand = new RelayCommand(_ => FilterDate = FilterDate.AddDays(-1), _ => FilterByDate);
@@ -140,7 +140,8 @@ public class RecordsViewModel : ViewModelBase
             active.StartedAt,
             active.FinishedAt,
             active.MinutesSpent,
-            active.Comment);
+            active.Comment,
+            active.Task.Closed);
     }
 
     private async Task<List<TaskDto>> GetTasksAsync()

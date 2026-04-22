@@ -31,7 +31,8 @@ public class GetRecordsQueryHandler(IRecordRepository repository)
                 r.StartedAt,
                 r.FinishedAt,
                 r.MinutesSpent,
-                r.Comment))
+                r.Comment,
+                r.Task.Closed))
             .ToList();
     }
 }
