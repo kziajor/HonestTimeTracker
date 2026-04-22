@@ -18,7 +18,7 @@ public partial class TodayPage : UserControl
 
     private void UpdateTitleColumnWidth()
     {
-        const double fixedWidth = 160 + 90 + 120 + 80; // Project + Plan + Spent + Actions
+        const double fixedWidth = 160 + 90 + 120 + 130; // Project + Plan + Spent + Actions
         var available = TaskListView.ActualWidth - fixedWidth - 26;
         if (available > 80)
             TitleColumn.Width = available;

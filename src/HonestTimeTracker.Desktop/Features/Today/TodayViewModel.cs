@@ -21,6 +21,7 @@ public class TodayViewModel : ViewModelBase
     public ICommand RemoveFromTodayCommand { get; }
     public ICommand StartTimerCommand { get; }
     public ICommand StopTimerCommand { get; }
+    public ICommand CloseTaskCommand { get; }
 
     public TodayViewModel(IServiceScopeFactory scopeFactory, ITimerStateService timerStateService, ITimerStopService timerStopService)
     {
@@ -30,6 +31,7 @@ public class TodayViewModel : ViewModelBase
         RemoveFromTodayCommand = new AsyncRelayCommand(p => RemoveFromTodayAsync((TaskDto)p!), p => p is TaskDto);
         StartTimerCommand = new AsyncRelayCommand(p => StartTimerAsync((TaskDto)p!), p => p is TaskDto);
         StopTimerCommand = new AsyncRelayCommand(p => StopTimerAsync((TaskDto)p!), p => p is TaskDto);
+        CloseTaskCommand = new AsyncRelayCommand(p => CloseTaskAsync((TaskDto)p!), p => p is TaskDto);
     }
 
     public async Task LoadAsync()
@@ -106,5 +108,20 @@ public class TodayViewModel : ViewModelBase
     {
         if (await _timerStopService.SafeStopAsync())
             await LoadAsync();
+    }
+
+    private async Task CloseTaskAsync(TaskDto task)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var handler = scope.ServiceProvider.GetRequiredService<ICommandHandler<ToggleTaskClosedCommand, Unit>>();
+        try
+        {
+            await handler.HandleAsync(new ToggleTaskClosedCommand(task.Id));
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 }

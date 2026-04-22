@@ -6,6 +6,7 @@ using HonestTimeTracker.Desktop.Features.Settings;
 using HonestTimeTracker.Desktop.Features.Tasks;
 using HonestTimeTracker.Desktop.Features.Today;
 using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -16,7 +17,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        Loaded += async (_, _) => await NavigateToAsync("Projects");
+        Loaded += async (_, _) => await NavigateToAsync("Today");
     }
 
     public async Task NavigateToRecordsAsync(DateOnly date)
@@ -24,16 +25,24 @@ public partial class MainWindow : Window
         var page = App.Services.GetRequiredService<RecordsPage>();
         MainContent.Content = page;
         await page.InitializeAsync(date);
+        SetActiveNavButton("Records");
     }
 
     private async void NavButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Button btn)
+        if (sender is RadioButton btn)
             await NavigateToAsync(btn.Tag?.ToString() ?? string.Empty);
+    }
+
+    private void SetActiveNavButton(string tag)
+    {
+        foreach (var rb in NavPanel.Children.OfType<RadioButton>())
+            rb.IsChecked = rb.Tag?.ToString() == tag;
     }
 
     private async Task NavigateToAsync(string tag)
     {
+        SetActiveNavButton(tag);
         switch (tag)
         {
             case "Projects":

@@ -32,14 +32,14 @@
                 </Border>
 
                 <!-- Navigation -->
-                <StackPanel DockPanel.Dock="Top" Margin="0,8,0,0">
-                    <Button Style="{StaticResource NavButton}" Content="Today"    Tag="Today"    Click="NavButton_Click" />
-                    <Button Style="{StaticResource NavButton}" Content="Projects" Tag="Projects" Click="NavButton_Click" />
-                    <Button Style="{StaticResource NavButton}" Content="Tasks"    Tag="Tasks"    Click="NavButton_Click" />
-                    <Button Style="{StaticResource NavButton}" Content="Records"  Tag="Records"  Click="NavButton_Click" />
-                    <Button Style="{StaticResource NavButton}" Content="Leave"    Tag="Leave"    Click="NavButton_Click" />
-                    <Button Style="{StaticResource NavButton}" Content="Reports"  Tag="Reports"  Click="NavButton_Click" />
-                    <Button Style="{StaticResource NavButton}" Content="Settings" Tag="Settings" Click="NavButton_Click" />
+                <StackPanel x:Name="NavPanel" DockPanel.Dock="Top" Margin="0,8,0,0">
+                    <RadioButton Style="{StaticResource NavButton}" Content="Today"    Tag="Today"    GroupName="Nav" Click="NavButton_Click" />
+                    <RadioButton Style="{StaticResource NavButton}" Content="Projects" Tag="Projects" GroupName="Nav" Click="NavButton_Click" />
+                    <RadioButton Style="{StaticResource NavButton}" Content="Tasks"    Tag="Tasks"    GroupName="Nav" Click="NavButton_Click" />
+                    <RadioButton Style="{StaticResource NavButton}" Content="Records"  Tag="Records"  GroupName="Nav" Click="NavButton_Click" />
+                    <RadioButton Style="{StaticResource NavButton}" Content="Leave"    Tag="Leave"    GroupName="Nav" Click="NavButton_Click" />
+                    <RadioButton Style="{StaticResource NavButton}" Content="Reports"  Tag="Reports"  GroupName="Nav" Click="NavButton_Click" />
+                    <RadioButton Style="{StaticResource NavButton}" Content="Settings" Tag="Settings" GroupName="Nav" Click="NavButton_Click" />
                 </StackPanel>
             </DockPanel>
         </Border>

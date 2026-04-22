@@ -147,21 +147,24 @@
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
 
-                                        <!-- Start timer (play) — zielony, widoczny gdy brak aktywnego timera -->
+                                        <!-- Start timer (play) — zielony, widoczny gdy brak aktywnego timera i zadanie otwarte -->
                                         <Button ToolTip="Start timer"
                                                 Margin="0,0,4,0"
-                                                Visibility="{Binding HasActiveTimer, Converter={StaticResource InverseBoolToVisibility}}"
                                                 Command="{Binding DataContext.StartTimerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}">
                                             <Button.Style>
                                                 <Style TargetType="Button" BasedOn="{StaticResource IconButtonPrimary}">
                                                     <Setter Property="Background" Value="#2E7D32" />
                                                     <Setter Property="BorderBrush" Value="#2E7D32" />
+                                                    <Setter Property="Visibility" Value="{Binding HasActiveTimer, Converter={StaticResource InverseBoolToVisibility}}" />
                                                     <Style.Triggers>
                                                         <Trigger Property="IsMouseOver" Value="True">
                                                             <Setter Property="Background" Value="#1B5E20" />
                                                             <Setter Property="BorderBrush" Value="#1B5E20" />
                                                         </Trigger>
+                                                        <DataTrigger Binding="{Binding Closed}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </Button.Style>
@@ -172,13 +175,21 @@
                                             </Viewbox>
                                         </Button>
 
-                                        <!-- Stop timer (square) — czerwony, widoczny gdy timer aktywny -->
-                                        <Button Style="{StaticResource IconButtonDanger}"
-                                                ToolTip="Stop timer"
+                                        <!-- Stop timer (square) — czerwony, widoczny gdy timer aktywny i zadanie otwarte -->
+                                        <Button ToolTip="Stop timer"
                                                 Margin="0,0,4,0"
-                                                Visibility="{Binding HasActiveTimer, Converter={StaticResource BoolToVisibility}}"
                                                 Command="{Binding DataContext.StopTimerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource IconButtonDanger}">
+                                                    <Setter Property="Visibility" Value="{Binding HasActiveTimer, Converter={StaticResource BoolToVisibility}}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Closed}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
                                             <Viewbox Width="15" Height="15">
                                                 <Canvas Width="24" Height="24">
                                                     <Rectangle Canvas.Left="3" Canvas.Top="3" Width="18" Height="18" Fill="White" RadiusX="2" RadiusY="2"/>
