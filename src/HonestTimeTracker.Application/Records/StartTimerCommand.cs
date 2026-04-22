@@ -22,7 +22,7 @@ public class StartTimerCommandHandler(IRecordRepository recordRepository)
         var record = new WorkRecord
         {
             TaskId = command.TaskId,
-            StartedAt = DateTime.Now,
+            StartedAt = DateTime.Now.TruncateToMinute(),
             FinishedAt = null,
             MinutesSpent = 0
         };

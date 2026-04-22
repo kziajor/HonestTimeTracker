@@ -16,7 +16,7 @@ public class StopTimerCommandHandler(IRecordRepository recordRepository, ITaskRe
         if (record is null)
             return Unit.Value;
 
-        record.FinishedAt = DateTime.Now;
+        record.FinishedAt = DateTime.Now.TruncateToMinute();
         record.MinutesSpent = (int)(record.FinishedAt.Value - record.StartedAt).TotalMinutes;
 
         var task = await taskRepository.GetByIdAsync(record.TaskId, ct);
