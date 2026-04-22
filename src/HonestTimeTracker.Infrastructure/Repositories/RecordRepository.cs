@@ -23,7 +23,7 @@ public class RecordRepository(AppDbContext db) : IRecordRepository
             query = query.Where(r => r.StartedAt.Date == day.Date);
         }
 
-        return query.OrderByDescending(r => r.StartedAt).ToListAsync(ct);
+        return query.OrderBy(r => r.StartedAt).ToListAsync(ct);
     }
 
     public Task<List<WorkRecord>> GetByDateRangeAsync(DateOnly from, DateOnly to, CancellationToken ct)

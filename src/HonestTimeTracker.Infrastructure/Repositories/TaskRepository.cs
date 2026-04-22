@@ -15,13 +15,22 @@ public class TaskRepository(AppDbContext db) : ITaskRepository
             : query.Where(t => !t.Closed);
         if (projectId.HasValue)
             query = query.Where(t => t.ProjectId == projectId);
-        return query.OrderBy(t => t.Title).ToListAsync(ct);
+        if (showClosed)
+            return query.OrderByDescending(t => t.ClosedAt).ToListAsync(ct);
+
+        return query
+            .OrderBy(t => t.TfsWorkItemId == null ? 1 : 0)
+            .ThenBy(t => t.TfsWorkItemId)
+            .ThenBy(t => t.Title)
+            .ToListAsync(ct);
     }
 
     public Task<List<WorkTask>> GetTodayAsync(CancellationToken ct) =>
         db.Tasks.Include(t => t.Project)
             .Where(t => t.IsOnTodayList)
-            .OrderBy(t => t.Title)
+            .OrderBy(t => t.TfsWorkItemId == null ? 1 : 0)
+            .ThenBy(t => t.TfsWorkItemId)
+            .ThenBy(t => t.Title)
             .ToListAsync(ct);
 
     public Task<WorkTask?> GetByIdAsync(int id, CancellationToken ct) =>

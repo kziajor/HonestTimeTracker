@@ -7,6 +7,7 @@ public class WorkTask
     public int PlannedMinutes { get; set; }
     public int SpentMinutes { get; set; }
     public bool Closed { get; set; }
+    public DateTime? ClosedAt { get; set; }
     public bool IsOnTodayList { get; set; }
 
     public int? ProjectId { get; set; }

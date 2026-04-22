@@ -80,7 +80,8 @@
                     Click="Cancel_Click" />
             <Button x:Name="OkButton"
                     Content="Save"
-                    Width="90"
+                    MinWidth="110"
+                    Padding="16,8"
                     Click="Ok_Click" />
         </StackPanel>
     </Grid>

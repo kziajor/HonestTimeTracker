@@ -9,6 +9,7 @@ public class ToggleTaskClosedCommandHandler(ITaskRepository repository)
             ?? throw new InvalidOperationException($"Task with ID {command.Id} does not exist.");
 
         task.Closed = !task.Closed;
+        task.ClosedAt = task.Closed ? DateTime.UtcNow : null;
         await repository.SaveChangesAsync(ct);
         return Unit.Value;
     }
