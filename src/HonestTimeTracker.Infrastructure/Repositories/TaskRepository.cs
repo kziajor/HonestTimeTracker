@@ -28,7 +28,8 @@ public class TaskRepository(AppDbContext db) : ITaskRepository
     public Task<List<WorkTask>> GetTodayAsync(CancellationToken ct) =>
         db.Tasks.Include(t => t.Project)
             .Where(t => t.IsOnTodayList)
-            .OrderBy(t => t.TfsWorkItemId == null ? 1 : 0)
+            .OrderBy(t => t.Closed ? 1 : 0)
+            .ThenBy(t => t.TfsWorkItemId == null ? 1 : 0)
             .ThenBy(t => t.TfsWorkItemId)
             .ThenBy(t => t.Title)
             .ToListAsync(ct);
