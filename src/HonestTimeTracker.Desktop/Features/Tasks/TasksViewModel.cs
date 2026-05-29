@@ -118,7 +118,13 @@ public class TasksViewModel : ViewModelBase
         var handler = scope.ServiceProvider.GetRequiredService<ICommandHandler<CreateTaskCommand, int>>();
         try
         {
-            await handler.HandleAsync(new CreateTaskCommand(dialog.TaskTitle, dialog.PlannedMinutes, dialog.ProjectId, dialog.TfsWorkItemId));
+            var newId = await handler.HandleAsync(new CreateTaskCommand(dialog.TaskTitle, dialog.PlannedMinutes, dialog.ProjectId, dialog.TfsWorkItemId));
+            if (dialog.IsOnTodayList)
+            {
+                using var todayScope = _scopeFactory.CreateScope();
+                var todayHandler = todayScope.ServiceProvider.GetRequiredService<ICommandHandler<SetTodayListCommand, Unit>>();
+                await todayHandler.HandleAsync(new SetTodayListCommand(newId, true));
+            }
             await LoadAsync();
         }
         catch (Exception ex)
@@ -130,7 +136,7 @@ public class TasksViewModel : ViewModelBase
     private async Task EditAsync(TaskDto task)
     {
         var projects = await GetProjectsAsync();
-        var dialog = new TaskDialog(projects, task.Title, task.PlannedMinutes, task.ProjectId, existingTfsWorkItemId: task.TfsWorkItemId)
+        var dialog = new TaskDialog(projects, task.Title, task.PlannedMinutes, task.ProjectId, existingTfsWorkItemId: task.TfsWorkItemId, existingIsOnTodayList: task.IsOnTodayList)
         {
             Owner = System.Windows.Application.Current.MainWindow
         };
@@ -141,6 +147,12 @@ public class TasksViewModel : ViewModelBase
         try
         {
             await handler.HandleAsync(new UpdateTaskCommand(task.Id, dialog.TaskTitle, dialog.PlannedMinutes, dialog.ProjectId, dialog.TfsWorkItemId));
+            if (dialog.IsOnTodayList != task.IsOnTodayList)
+            {
+                using var todayScope = _scopeFactory.CreateScope();
+                var todayHandler = todayScope.ServiceProvider.GetRequiredService<ICommandHandler<SetTodayListCommand, Unit>>();
+                await todayHandler.HandleAsync(new SetTodayListCommand(task.Id, dialog.IsOnTodayList));
+            }
             await LoadAsync();
         }
         catch (Exception ex)

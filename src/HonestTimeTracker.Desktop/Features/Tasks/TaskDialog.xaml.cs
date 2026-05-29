@@ -10,8 +10,9 @@ public partial class TaskDialog : Window
     public int PlannedMinutes { get; private set; }
     public int ProjectId => ((ProjectDto)ProjectComboBox.SelectedItem).Id;
     public int? TfsWorkItemId { get; private set; }
+    public bool IsOnTodayList => IsOnTodayListCheckBox.IsChecked == true;
 
-    public TaskDialog(IEnumerable<ProjectDto> projects, string? existingTitle = null, int existingPlannedMinutes = 0, int? existingProjectId = null, double? defaultPlannedHours = null, int? existingTfsWorkItemId = null)
+    public TaskDialog(IEnumerable<ProjectDto> projects, string? existingTitle = null, int existingPlannedMinutes = 0, int? existingProjectId = null, double? defaultPlannedHours = null, int? existingTfsWorkItemId = null, bool existingIsOnTodayList = false)
     {
         InitializeComponent();
 
@@ -35,6 +36,8 @@ public partial class TaskDialog : Window
 
         if (existingTfsWorkItemId.HasValue)
             TfsWorkItemIdBox.Text = existingTfsWorkItemId.Value.ToString();
+
+        IsOnTodayListCheckBox.IsChecked = existingIsOnTodayList;
 
         Loaded += (_, _) =>
         {
