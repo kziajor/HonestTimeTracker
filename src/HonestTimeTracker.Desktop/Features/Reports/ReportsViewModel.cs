@@ -2,7 +2,9 @@ using HonestTimeTracker.Application;
 using HonestTimeTracker.Application.Reports;
 using HonestTimeTracker.Desktop.Common;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Win32;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Input;
 
@@ -136,6 +138,7 @@ public class ReportsViewModel : ViewModelBase
     public ObservableCollection<NormMonthRow> MonthRows { get; } = [];
 
     public ICommand CalculateCommand { get; }
+    public ICommand ExportCommand { get; }
 
     public event Func<DateOnly, Task>? NavigateToRecordsRequested;
 
@@ -144,6 +147,7 @@ public class ReportsViewModel : ViewModelBase
         _scopeFactory = scopeFactory;
         _selectedMonth = Months.First(m => m.Value == DateTime.Today.Month);
         CalculateCommand = new AsyncRelayCommand(_ => CalculateAsync());
+        ExportCommand = new AsyncRelayCommand(_ => ExportAsync(), _ => HasReport);
     }
 
     public async Task DrillDownToMonthAsync(int month)
@@ -202,6 +206,47 @@ public class ReportsViewModel : ViewModelBase
         {
             foreach (var d in report.Days)
                 DayRows.Add(new NormDayRow(d.Date, d.IsWeekend, d.IsLeave, d.RequiredHours, Math.Round(d.ActualHours, 2)));
+        }
+    }
+
+    private async Task ExportAsync()
+    {
+        if (!int.TryParse(Year, out var year)) return;
+
+        var defaultName = SelectedMonth.Value.HasValue
+            ? $"HonestTimeTracker_Report_{year:D4}-{SelectedMonth.Value.Value:D2}.xlsx"
+            : $"HonestTimeTracker_Report_{year:D4}.xlsx";
+
+        var dialog = new SaveFileDialog
+        {
+            Filter = "Excel files (*.xlsx)|*.xlsx",
+            FileName = defaultName,
+            DefaultExt = ".xlsx",
+            AddExtension = true,
+            OverwritePrompt = true,
+        };
+
+        if (dialog.ShowDialog() != true) return;
+
+        var path = dialog.FileName;
+
+        try
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var reportHandler = scope.ServiceProvider.GetRequiredService<IQueryHandler<GetNormReportQuery, NormReportDto>>();
+            var recordsHandler = scope.ServiceProvider.GetRequiredService<IQueryHandler<GetExportRecordsQuery, List<ExportRecordDto>>>();
+
+            var month = SelectedMonth.Value;
+            var report = await reportHandler.HandleAsync(new GetNormReportQuery(year, month));
+            var records = await recordsHandler.HandleAsync(new GetExportRecordsQuery(year, month));
+
+            ReportExcelExporter.Export(path, records, report);
+
+            Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show(ex.Message, "Export failed", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
         }
     }
 }

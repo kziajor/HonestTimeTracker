@@ -9,6 +9,7 @@
 | Microsoft.Extensions.DependencyInjection | Kontener DI z Microsoft.Extensions | MIT | https://github.com/dotnet/runtime |
 | FluentValidation | Walidacja modeli oparta na wyrażeniach | Apache 2.0 | https://github.com/FluentValidation/FluentValidation |
 | Dapper | Micro-ORM dla ADO.NET (używany w MigrationTool do odczytu CTT) | Apache 2.0 | https://github.com/DapperLib/Dapper |
+| ClosedXML | Generowanie plików .xlsx (eksport raportów) | MIT | https://github.com/ClosedXML/ClosedXML |
 
 ## Wersje
 
@@ -20,3 +21,4 @@
 | FluentValidation | 12.1.1 |
 | dotnet-ef (tool) | 10.0.6 |
 | Dapper | 2.1.35 |
+| ClosedXML | 0.105.0 |

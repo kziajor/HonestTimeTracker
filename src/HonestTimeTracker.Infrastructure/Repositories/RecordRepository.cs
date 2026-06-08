@@ -35,6 +35,18 @@ public class RecordRepository(AppDbContext db) : IRecordRepository
             .ToListAsync(ct);
     }
 
+    public Task<List<WorkRecord>> GetByDateRangeWithRelationsAsync(DateOnly from, DateOnly to, CancellationToken ct)
+    {
+        var fromDt = from.ToDateTime(TimeOnly.MinValue);
+        var toDt = to.ToDateTime(TimeOnly.MaxValue);
+        return db.Records
+            .Include(r => r.Task)
+            .ThenInclude(t => t.Project)
+            .Where(r => r.StartedAt >= fromDt && r.StartedAt <= toDt)
+            .OrderBy(r => r.StartedAt)
+            .ToListAsync(ct);
+    }
+
     public async Task<DateOnly?> GetEarliestDateAsync(CancellationToken ct)
     {
         var min = await db.Records.MinAsync(r => (DateTime?)r.StartedAt, ct);

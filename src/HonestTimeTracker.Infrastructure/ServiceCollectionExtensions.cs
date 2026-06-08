@@ -84,6 +84,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IQueryHandler<GetLeavesQuery, List<LeaveDto>>, GetLeavesQueryHandler>();
 
         services.AddScoped<IQueryHandler<GetNormReportQuery, NormReportDto>, GetNormReportQueryHandler>();
+        services.AddScoped<IQueryHandler<GetExportRecordsQuery, List<ExportRecordDto>>, GetExportRecordsQueryHandler>();
 
         return services;
     }

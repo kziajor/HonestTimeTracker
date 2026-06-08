@@ -38,6 +38,11 @@
                     Command="{Binding CalculateCommand}"
                     Margin="20,0,0,0"
                     Padding="20,8" />
+
+            <Button Content="Export"
+                    Command="{Binding ExportCommand}"
+                    Margin="8,0,0,0"
+                    Padding="20,8" />
         </StackPanel>
 
         <!-- Summary cards (visible only when HasReport = true) -->
