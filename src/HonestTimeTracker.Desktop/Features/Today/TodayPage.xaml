@@ -22,6 +22,15 @@
                 <ListView.View>
                     <GridView>
 
+                        <!-- TFS ID -->
+                        <GridViewColumn Header="TFS ID" Width="70">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding TfsWorkItemId}" HorizontalAlignment="Right" Foreground="#555555" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+
                         <!-- Title -->
                         <GridViewColumn x:Name="TitleColumn" Header="Title" Width="280">
                             <GridViewColumn.CellTemplate>
@@ -61,7 +70,7 @@
                         </GridViewColumn>
 
                         <!-- Spent time -->
-                        <GridViewColumn Header="Spent (h)" Width="120">
+                        <GridViewColumn Header="Spent (h)" Width="70">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding SpentMinutes, Converter={StaticResource MinutesToHours}}" HorizontalAlignment="Right" />
