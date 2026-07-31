@@ -44,14 +44,23 @@ public class ReportsViewModel : ViewModelBase
     public string Year
     {
         get => _year;
-        set => Set(ref _year, value);
+        set
+        {
+            Set(ref _year, value);
+            if (int.TryParse(value, out var y) && y >= 2000 && y <= 2100)
+                _ = CalculateAsync();
+        }
     }
 
     private MonthItem _selectedMonth = null!;
     public MonthItem SelectedMonth
     {
         get => _selectedMonth;
-        set => Set(ref _selectedMonth, value);
+        set
+        {
+            Set(ref _selectedMonth, value);
+            _ = CalculateAsync();
+        }
     }
 
     public List<MonthItem> Months { get; } =
@@ -137,7 +146,6 @@ public class ReportsViewModel : ViewModelBase
     public ObservableCollection<NormDayRow> DayRows { get; } = [];
     public ObservableCollection<NormMonthRow> MonthRows { get; } = [];
 
-    public ICommand CalculateCommand { get; }
     public ICommand ExportCommand { get; }
 
     public event Func<DateOnly, Task>? NavigateToRecordsRequested;
@@ -146,7 +154,6 @@ public class ReportsViewModel : ViewModelBase
     {
         _scopeFactory = scopeFactory;
         _selectedMonth = Months.First(m => m.Value == null);
-        CalculateCommand = new AsyncRelayCommand(_ => CalculateAsync());
         ExportCommand = new AsyncRelayCommand(_ => ExportAsync(), _ => HasReport);
     }
 
@@ -162,13 +169,12 @@ public class ReportsViewModel : ViewModelBase
             await NavigateToRecordsRequested(date);
     }
 
+    public Task LoadAsync() => CalculateAsync();
+
     private async Task CalculateAsync()
     {
         if (!int.TryParse(Year, out var year) || year < 2000 || year > 2100)
-        {
-            System.Windows.MessageBox.Show("Enter a valid year (2000–2100).", "Validation", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
             return;
-        }
 
         using var scope = _scopeFactory.CreateScope();
         var handler = scope.ServiceProvider.GetRequiredService<IQueryHandler<GetNormReportQuery, NormReportDto>>();

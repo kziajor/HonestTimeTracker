@@ -47,8 +47,8 @@ public partial class App : System.Windows.Application
         services.AddTransient<SettingsPage>();
         services.AddTransient<LeaveViewModel>();
         services.AddTransient<LeavePage>();
-        services.AddTransient<ReportsViewModel>();
-        services.AddTransient<ReportsPage>();
+        services.AddSingleton<ReportsViewModel>();
+        services.AddSingleton<ReportsPage>();
 
         Services = services.BuildServiceProvider();
 

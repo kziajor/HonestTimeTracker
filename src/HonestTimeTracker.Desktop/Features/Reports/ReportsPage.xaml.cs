@@ -20,7 +20,7 @@ public partial class ReportsPage : UserControl
         };
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public Task InitializeAsync() => _vm.LoadAsync();
 
     private async void MonthList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {

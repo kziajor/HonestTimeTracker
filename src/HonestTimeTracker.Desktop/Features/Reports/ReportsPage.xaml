@@ -34,11 +34,6 @@
                       Padding="8,6"
                       FontSize="14" />
 
-            <Button Content="Calculate"
-                    Command="{Binding CalculateCommand}"
-                    Margin="20,0,0,0"
-                    Padding="20,8" />
-
             <Button Content="Export"
                     Command="{Binding ExportCommand}"
                     Margin="8,0,0,0"
