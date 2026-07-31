@@ -145,7 +145,7 @@ public class ReportsViewModel : ViewModelBase
     public ReportsViewModel(IServiceScopeFactory scopeFactory)
     {
         _scopeFactory = scopeFactory;
-        _selectedMonth = Months.First(m => m.Value == DateTime.Today.Month);
+        _selectedMonth = Months.First(m => m.Value == null);
         CalculateCommand = new AsyncRelayCommand(_ => CalculateAsync());
         ExportCommand = new AsyncRelayCommand(_ => ExportAsync(), _ => HasReport);
     }
