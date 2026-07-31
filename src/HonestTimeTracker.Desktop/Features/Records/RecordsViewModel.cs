@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using WpfApp = System.Windows.Application;
 
 namespace HonestTimeTracker.Desktop.Features.Records;
@@ -18,6 +19,7 @@ public class RecordsViewModel : ViewModelBase
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ITimerStateService _timerStateService;
     private readonly ITimerStopService _timerStopService;
+    private readonly DispatcherTimer _elapsedTicker;
     private DateOnly _filterDate = DateOnly.FromDateTime(DateTime.Today);
     private bool _filterByDate = true;
     private RecordsSummaryDto? _summary;
@@ -37,6 +39,11 @@ public class RecordsViewModel : ViewModelBase
                 OnPropertyChanged(nameof(ActiveProjectName));
                 OnPropertyChanged(nameof(ActiveStartTime));
                 OnPropertyChanged(nameof(ActiveElapsed));
+
+                if (_activeRecord != null)
+                    _elapsedTicker.Start();
+                else
+                    _elapsedTicker.Stop();
             }
         }
     }
@@ -99,6 +106,8 @@ public class RecordsViewModel : ViewModelBase
         _scopeFactory = scopeFactory;
         _timerStateService = timerStateService;
         _timerStopService = timerStopService;
+        _elapsedTicker = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _elapsedTicker.Tick += (_, _) => OnPropertyChanged(nameof(ActiveElapsed));
         AddCommand = new AsyncRelayCommand(_ => AddAsync());
         EditCommand = new AsyncRelayCommand(p => EditAsync((RecordDto)p!), p => p is RecordDto r && !r.TaskClosed);
         DeleteCommand = new AsyncRelayCommand(p => DeleteAsync((RecordDto)p!), p => p is RecordDto);
@@ -276,4 +285,6 @@ public class RecordsViewModel : ViewModelBase
         if (await _timerStopService.SafeStopAsync())
             await LoadAsync();
     }
+
+    internal void StopTicker() => _elapsedTicker.Stop();
 }

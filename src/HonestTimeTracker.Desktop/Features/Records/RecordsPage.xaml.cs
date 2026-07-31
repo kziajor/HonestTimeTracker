@@ -11,6 +11,7 @@ public partial class RecordsPage : UserControl
         InitializeComponent();
         _vm = vm;
         DataContext = vm;
+        Unloaded += (_, _) => _vm.StopTicker();
     }
 
     public async Task InitializeAsync() => await _vm.LoadAsync();
