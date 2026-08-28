@@ -42,8 +42,8 @@ public class GetNormReportQueryHandler(
             ? new DateOnly(query.Year, query.Month.Value, DateTime.DaysInMonth(query.Year, query.Month.Value))
             : new DateOnly(query.Year, 12, 31);
 
-        var today = DateOnly.FromDateTime(DateTime.Today);
-        if (to > today) to = today;
+        var yesterday = DateOnly.FromDateTime(DateTime.Today).AddDays(-1);
+        if (to > yesterday) to = yesterday;
 
         var earliest = await recordRepository.GetEarliestDateAsync(ct);
         if (earliest.HasValue && earliest.Value > from)
@@ -75,8 +75,6 @@ public class GetNormReportQueryHandler(
             var isLeave = leaveDays.Contains(current);
             var required = (isWeekend || isLeave) ? 0.0 : settings.DailyWorkHours;
             var actual = actualByDay.GetValueOrDefault(current, 0.0);
-            if (current == today && actual < required)
-                actual = required;
             days.Add(new NormReportDayEntry(current, isWeekend, isLeave, required, actual));
             current = current.AddDays(1);
         }
