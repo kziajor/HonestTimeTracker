@@ -1,4 +1,4 @@
-<UserControl x:Class="HonestTimeTracker.Desktop.Features.Records.RecordsPage"
+﻿<UserControl x:Class="HonestTimeTracker.Desktop.Features.Records.RecordsPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
@@ -22,10 +22,6 @@
 
         <!-- Filter row -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
-            <CheckBox Content="Filter by date"
-                      IsChecked="{Binding FilterByDate}"
-                      VerticalAlignment="Center"
-                      Margin="0,0,12,0" />
             <Button Style="{StaticResource IconButtonNeutral}"
                     Command="{Binding PreviousDayCommand}"
                     ToolTip="Previous day"
@@ -40,7 +36,6 @@
             </Button>
             <DatePicker x:Name="FilterDatePicker"
                         SelectedDate="{Binding FilterDate, Converter={StaticResource DateOnlyConverter}}"
-                        IsEnabled="{Binding FilterByDate}"
                         FontSize="13"
                         VerticalAlignment="Center" />
             <Button Style="{StaticResource IconButtonNeutral}"
@@ -196,8 +191,11 @@
             </StackPanel>
         </Border>
 
-        <!-- Records list -->
-        <Border Grid.Row="4" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4">
+        <!-- Tabs: List / Summary -->
+        <TabControl Grid.Row="4" BorderThickness="0" Background="Transparent" Padding="0,8,0,0">
+
+        <TabItem Header="List">
+        <Border BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4">
             <ListView x:Name="RecordsListView"
                       ItemsSource="{Binding Records}"
                       BorderThickness="0"
@@ -329,5 +327,138 @@
                 </ListView.View>
             </ListView>
         </Border>
+        </TabItem>
+
+        <TabItem Header="Summary">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Empty state -->
+                <TextBlock Grid.Row="0"
+                           Text="No time tracked on this day"
+                           FontSize="13"
+                           Foreground="#888888"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Visibility="{Binding HasProjectSummary, Converter={StaticResource InverseBoolToVisibility}}" />
+
+                <!-- Per-project share -->
+                <Border Grid.Row="0"
+                        BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4"
+                        Visibility="{Binding HasProjectSummary, Converter={StaticResource BoolToVisibility}}">
+                    <ListView x:Name="ProjectSummaryListView"
+                              ItemsSource="{Binding ProjectSummary}"
+                              BorderThickness="0"
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.View>
+                            <GridView>
+
+                                <!-- Project -->
+                                <GridViewColumn x:Name="SummaryProjectColumn" Header="Project" Width="220">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding ProjectName}">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding HasProject}" Value="False">
+                                                                <Setter Property="Foreground" Value="#888888" />
+                                                                <Setter Property="FontStyle" Value="Italic" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <!-- Time -->
+                                <GridViewColumn Header="Time" Width="110"
+                                                HeaderContainerStyle="{StaticResource RightAlignedColumnHeader}">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding TimeLabel}" HorizontalAlignment="Right" TextAlignment="Right" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <!-- Share -->
+                                <GridViewColumn Header="Share" Width="90"
+                                                HeaderContainerStyle="{StaticResource RightAlignedColumnHeader}">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding PercentLabel}" HorizontalAlignment="Right" TextAlignment="Right" FontWeight="SemiBold" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <!-- Share bar -->
+                                <GridViewColumn Header="" Width="240">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ProgressBar Value="{Binding Percent, Mode=OneWay}"
+                                                         Minimum="0" Maximum="100"
+                                                         Width="220" Height="6"
+                                                         HorizontalAlignment="Left"
+                                                         VerticalAlignment="Center">
+                                                <ProgressBar.Style>
+                                                    <Style TargetType="ProgressBar">
+                                                        <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+                                                        <Setter Property="Background" Value="#00000011" />
+                                                        <Setter Property="BorderThickness" Value="0" />
+                                                        <Setter Property="Template">
+                                                            <Setter.Value>
+                                                                <ControlTemplate TargetType="ProgressBar">
+                                                                    <Border x:Name="PART_Track"
+                                                                            Background="{TemplateBinding Background}"
+                                                                            CornerRadius="3"
+                                                                            Height="{TemplateBinding Height}">
+                                                                        <Border x:Name="PART_Indicator"
+                                                                                HorizontalAlignment="Left"
+                                                                                Background="{TemplateBinding Foreground}"
+                                                                                CornerRadius="3" />
+                                                                    </Border>
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Style>
+                                                </ProgressBar.Style>
+                                            </ProgressBar>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Border>
+
+                <!-- Total -->
+                <Border Grid.Row="1"
+                        Margin="0,8,0,0"
+                        Padding="12,8,27,0"
+                        BorderBrush="#E0E0E0" BorderThickness="0,1,0,0"
+                        Visibility="{Binding HasProjectSummary, Converter={StaticResource BoolToVisibility}}">
+                    <DockPanel>
+                        <Border DockPanel.Dock="Right" Width="240" />
+                        <TextBlock DockPanel.Dock="Right" Text="100.0%" Width="90" TextAlignment="Right" FontWeight="Bold" />
+                        <TextBlock DockPanel.Dock="Right" Text="{Binding ProjectSummaryTotal}" Width="110" TextAlignment="Right" FontWeight="Bold" />
+                        <TextBlock Text="Total" FontWeight="Bold" />
+                    </DockPanel>
+                </Border>
+
+            </Grid>
+        </TabItem>
+
+        </TabControl>
     </Grid>
 </UserControl>

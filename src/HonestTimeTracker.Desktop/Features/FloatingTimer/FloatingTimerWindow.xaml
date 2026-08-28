@@ -1,4 +1,4 @@
-<Window x:Class="HonestTimeTracker.Desktop.Features.FloatingTimer.FloatingTimerWindow"
+﻿<Window x:Class="HonestTimeTracker.Desktop.Features.FloatingTimer.FloatingTimerWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Timer"
@@ -106,7 +106,8 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="ProgressBar">
-                                        <Border Background="{TemplateBinding Background}"
+                                        <Border x:Name="PART_Track"
+                                                Background="{TemplateBinding Background}"
                                                 CornerRadius="3"
                                                 Height="{TemplateBinding Height}">
                                             <Border x:Name="PART_Indicator"
