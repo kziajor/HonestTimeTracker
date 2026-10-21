@@ -11,7 +11,12 @@ public partial class RecordsPage : UserControl
         InitializeComponent();
         _vm = vm;
         DataContext = vm;
-        Unloaded += (_, _) => _vm.StopTicker();
+        Loaded += (_, _) => _vm.Attach();
+        Unloaded += (_, _) =>
+        {
+            _vm.Detach();
+            _vm.StopTicker();
+        };
         ProjectSummaryListView.SizeChanged += (_, _) => UpdateSummaryProjectColumnWidth();
     }
 

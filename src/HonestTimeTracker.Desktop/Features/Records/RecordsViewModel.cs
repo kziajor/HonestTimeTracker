@@ -25,6 +25,7 @@ public class RecordsViewModel : ViewModelBase
     private RecordsSummaryDto? _summary;
     private RecordDto? _activeRecord;
     private double _projectSummaryTotalHours;
+    private bool _attached;
 
     public ObservableCollection<RecordDto> Records { get; } = [];
 
@@ -200,6 +201,34 @@ public class RecordsViewModel : ViewModelBase
         NextDayCommand = new RelayCommand(_ => FilterDate = FilterDate.AddDays(1));
     }
 
+    public void Attach()
+    {
+        if (_attached) return;
+        _timerStateService.TimerStarted += OnTimerStateChanged;
+        _timerStateService.TimerStopped += OnTimerStateChanged;
+        _attached = true;
+    }
+
+    public void Detach()
+    {
+        if (!_attached) return;
+        _timerStateService.TimerStarted -= OnTimerStateChanged;
+        _timerStateService.TimerStopped -= OnTimerStateChanged;
+        _attached = false;
+    }
+
+    private async void OnTimerStateChanged(object? sender, EventArgs e)
+    {
+        try
+        {
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
     public async Task LoadWithDateAsync(DateOnly date)
     {
         _filterDate = date;
@@ -272,6 +301,7 @@ public class RecordsViewModel : ViewModelBase
                         task.Id, task.Title, task.SpentMinutes, task.PlannedMinutes, dialog.StartedAt, task.TfsWorkItemId);
             }
 
+            _timerStateService.NotifyRecordsChanged();
             await LoadAsync();
         }
         catch (Exception ex)
@@ -325,6 +355,7 @@ public class RecordsViewModel : ViewModelBase
                 }
             }
 
+            _timerStateService.NotifyRecordsChanged();
             await LoadAsync();
         }
         catch (Exception ex)
@@ -351,6 +382,7 @@ public class RecordsViewModel : ViewModelBase
         try
         {
             await handler.HandleAsync(new DeleteRecordCommand(record.Id));
+            _timerStateService.NotifyRecordsChanged();
             await LoadAsync();
         }
         catch (Exception ex)
