@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Timer"
-        Width="300"
+        Width="328"
         SizeToContent="Height"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -12,166 +12,207 @@
         ResizeMode="NoResize"
         WindowStartupLocation="Manual">
 
-    <Border Background="#FBCB18"
-            CornerRadius="8"
-            Padding="14,10"
-            Cursor="SizeAll"
-            MouseLeftButtonDown="Border_MouseLeftButtonDown">
+    <Grid Margin="14,12,14,16">
 
-        <Border.Effect>
-            <DropShadowEffect Color="#000000"
-                              Opacity="0.4"
-                              BlurRadius="14"
-                              ShadowDepth="2"
-                              Direction="270" />
-        </Border.Effect>
+        <!-- Shadow layer: kept separate so the effect does not rasterize the text -->
+        <Border Background="#FBCB18"
+                CornerRadius="8">
+            <Border.Effect>
+                <DropShadowEffect Color="#000000"
+                                  Opacity="0.35"
+                                  BlurRadius="14"
+                                  ShadowDepth="3"
+                                  Direction="270" />
+            </Border.Effect>
+        </Border>
 
-        <StackPanel>
+        <Border Background="#FBCB18"
+                CornerRadius="8"
+                Padding="14,10"
+                Cursor="SizeAll"
+                MouseLeftButtonDown="Border_MouseLeftButtonDown"
+                MouseRightButtonUp="Border_MouseRightButtonUp">
 
-            <!-- Task title: wraps up to 2 lines, then clips -->
-            <TextBlock Text="{Binding TaskTitle}"
-                       FontWeight="SemiBold"
-                       FontSize="13"
-                       Foreground="#000000"
-                       TextWrapping="Wrap"
-                       TextTrimming="CharacterEllipsis"
-                       MaxWidth="272"
-                       MaxHeight="36"
-                       Margin="0,0,0,8" />
+            <StackPanel>
 
-            <!-- Spent / Planned -->
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
+                <!-- Task title: wraps up to 2 lines, then clips -->
+                <TextBlock Text="{Binding TaskTitle}"
+                           FontWeight="SemiBold"
+                           FontSize="13"
+                           Foreground="#000000"
+                           TextWrapping="Wrap"
+                           TextTrimming="CharacterEllipsis"
+                           MaxWidth="272"
+                           MaxHeight="36"
+                           Margin="0,0,0,8" />
 
-                <TextBlock Grid.Row="0" Grid.Column="0"
-                           Text="Spent"
-                           FontSize="10"
-                           Foreground="#5a3e00"
-                           Margin="0,0,0,1" />
-
-                <TextBlock Grid.Row="0" Grid.Column="1"
-                           Text="Planned"
-                           FontSize="10"
-                           Foreground="#5a3e00"
-                           Margin="0,0,0,1" />
-
-                <TextBlock Grid.Row="1" Grid.Column="0"
-                           Text="{Binding TotalSpentText}"
-                           FontWeight="Bold"
-                           FontSize="15"
-                           Foreground="#000000" />
-
-                <TextBlock Grid.Row="1" Grid.Column="1"
-                           Text="{Binding PlannedText}"
-                           FontWeight="Bold"
-                           FontSize="15"
-                           Foreground="#000000" />
-            </Grid>
-
-            <!-- Progress bar (only when planned > 0) -->
-            <StackPanel Margin="0,8,0,0"
-                        Visibility="{Binding IsDiffVisible, Converter={StaticResource BoolToVisibility}}">
-
-                <Grid Margin="0,0,0,3">
+                <!-- Spent / Planned / Day left -->
+                <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0"
-                               Text="Progress"
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0"
+                               Text="Spent"
                                FontSize="10"
-                               Foreground="#5a3e00" />
-                    <TextBlock Grid.Column="1"
-                               Text="{Binding ProgressPercentText}"
-                               FontSize="10"
-                               FontWeight="SemiBold"
-                               Foreground="#000000" />
-                </Grid>
-
-                <ProgressBar Value="{Binding ProgressPercent, Mode=OneWay}"
-                             Minimum="0" Maximum="100"
-                             Height="6">
-                    <ProgressBar.Style>
-                        <Style TargetType="ProgressBar">
-                            <Setter Property="Foreground" Value="#1a7a1a" />
-                            <Setter Property="Background" Value="#00000022" />
-                            <Setter Property="BorderThickness" Value="0" />
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="ProgressBar">
-                                        <Border x:Name="PART_Track"
-                                                Background="{TemplateBinding Background}"
-                                                CornerRadius="3"
-                                                Height="{TemplateBinding Height}">
-                                            <Border x:Name="PART_Indicator"
-                                                    HorizontalAlignment="Left"
-                                                    Background="{TemplateBinding Foreground}"
-                                                    CornerRadius="3" />
-                                        </Border>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsOvertime}" Value="True">
-                                    <Setter Property="Foreground" Value="#cc0000" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ProgressBar.Style>
-                </ProgressBar>
-
-            </StackPanel>
-
-            <!-- Diff row -->
-            <Grid Margin="0,6,0,0"
-                  Visibility="{Binding IsDiffVisible, Converter={StaticResource BoolToVisibility}}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <TextBlock FontSize="11"
                                Foreground="#5a3e00"
-                               Text="Diff: " />
+                               Margin="0,0,0,1" />
 
-                    <TextBlock Text="{Binding DiffText}"
-                               FontWeight="SemiBold"
-                               FontSize="11">
+                    <TextBlock Grid.Row="0" Grid.Column="1"
+                               Text="Planned"
+                               FontSize="10"
+                               Foreground="#5a3e00"
+                               Margin="0,0,0,1" />
+
+                    <TextBlock Grid.Row="0" Grid.Column="2"
+                               FontSize="10"
+                               Foreground="#5a3e00"
+                               Margin="0,0,0,1">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
-                                <Setter Property="Foreground" Value="#1a7a1a" />
+                                <Setter Property="Text" Value="Day left" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsOvertime}" Value="True">
-                                        <Setter Property="Foreground" Value="#cc0000" />
+                                    <DataTrigger Binding="{Binding IsDayComplete}" Value="True">
+                                        <Setter Property="Text" Value="Day overtime" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
 
-                    <TextBlock FontSize="11"
-                               FontWeight="SemiBold"
-                               Foreground="#cc0000"
-                               Text=" ⚠ overtime"
-                               Visibility="{Binding IsOvertime, Converter={StaticResource BoolToVisibility}}" />
+                    <TextBlock Grid.Row="1" Grid.Column="0"
+                               Text="{Binding TotalSpentText}"
+                               FontWeight="Bold"
+                               FontSize="15"
+                               Foreground="#000000" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="1"
+                               Text="{Binding PlannedText}"
+                               FontWeight="Bold"
+                               FontSize="15"
+                               Foreground="#000000" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="2"
+                               Text="{Binding DayLeftText}"
+                               FontWeight="Bold"
+                               FontSize="15">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                <Setter Property="Foreground" Value="#000000" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsDayComplete}" Value="True">
+                                        <Setter Property="Foreground" Value="#1a7a1a" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+
+                <!-- Progress bar (only when planned > 0) -->
+                <StackPanel Margin="0,8,0,0"
+                            Visibility="{Binding IsDiffVisible, Converter={StaticResource BoolToVisibility}}">
+
+                    <Grid Margin="0,0,0,3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0"
+                                   Text="Progress"
+                                   FontSize="10"
+                                   Foreground="#5a3e00" />
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding ProgressPercentText}"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="#000000" />
+                    </Grid>
+
+                    <ProgressBar Value="{Binding ProgressPercent, Mode=OneWay}"
+                                 Minimum="0" Maximum="100"
+                                 Height="6">
+                        <ProgressBar.Style>
+                            <Style TargetType="ProgressBar">
+                                <Setter Property="Foreground" Value="#1a7a1a" />
+                                <Setter Property="Background" Value="#00000022" />
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ProgressBar">
+                                            <Border x:Name="PART_Track"
+                                                    Background="{TemplateBinding Background}"
+                                                    CornerRadius="3"
+                                                    Height="{TemplateBinding Height}">
+                                                <Border x:Name="PART_Indicator"
+                                                        HorizontalAlignment="Left"
+                                                        Background="{TemplateBinding Foreground}"
+                                                        CornerRadius="3" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsOvertime}" Value="True">
+                                        <Setter Property="Foreground" Value="#cc0000" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ProgressBar.Style>
+                    </ProgressBar>
+
                 </StackPanel>
 
-                <TextBlock Grid.Column="1"
-                           Text="{Binding TfsWorkItemText}"
-                           FontSize="10"
-                           Foreground="#5a3e00"
-                           VerticalAlignment="Center"
-                           Visibility="{Binding IsTfsVisible, Converter={StaticResource BoolToVisibility}}" />
-            </Grid>
+                <!-- Diff row -->
+                <Grid Margin="0,6,0,0"
+                      Visibility="{Binding IsDiffVisible, Converter={StaticResource BoolToVisibility}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-        </StackPanel>
-    </Border>
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <TextBlock FontSize="11"
+                                   Foreground="#5a3e00"
+                                   Text="Diff: " />
+
+                        <TextBlock Text="{Binding DiffText}"
+                                   FontWeight="SemiBold"
+                                   FontSize="11">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                    <Setter Property="Foreground" Value="#1a7a1a" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsOvertime}" Value="True">
+                                            <Setter Property="Foreground" Value="#cc0000" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <TextBlock FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="#cc0000"
+                                   Text=" ⚠ overtime"
+                                   Visibility="{Binding IsOvertime, Converter={StaticResource BoolToVisibility}}" />
+                    </StackPanel>
+
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding TfsWorkItemText}"
+                               FontSize="10"
+                               Foreground="#5a3e00"
+                               VerticalAlignment="Center"
+                               Visibility="{Binding IsTfsVisible, Converter={StaticResource BoolToVisibility}}" />
+                </Grid>
+
+            </StackPanel>
+        </Border>
+    </Grid>
 </Window>

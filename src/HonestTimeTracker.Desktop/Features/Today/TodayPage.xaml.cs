@@ -11,6 +11,8 @@ public partial class TodayPage : UserControl
         InitializeComponent();
         _vm = vm;
         DataContext = vm;
+        Loaded += (_, _) => _vm.Attach();
+        Unloaded += (_, _) => _vm.Detach();
         TaskListView.SizeChanged += (_, _) => UpdateTitleColumnWidth();
     }
 

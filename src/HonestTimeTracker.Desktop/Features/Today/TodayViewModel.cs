@@ -1,5 +1,4 @@
 using HonestTimeTracker.Application;
-using HonestTimeTracker.Application.Records;
 using HonestTimeTracker.Application.Tasks;
 using HonestTimeTracker.Desktop.Common;
 using HonestTimeTracker.Desktop.Services;
@@ -15,6 +14,8 @@ public class TodayViewModel : ViewModelBase
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ITimerStateService _timerStateService;
     private readonly ITimerStopService _timerStopService;
+    private readonly ITimerSwitchService _timerSwitchService;
+    private bool _attached;
 
     public ObservableCollection<TaskDto> Tasks { get; } = [];
 
@@ -23,15 +24,48 @@ public class TodayViewModel : ViewModelBase
     public ICommand StopTimerCommand { get; }
     public ICommand CloseTaskCommand { get; }
 
-    public TodayViewModel(IServiceScopeFactory scopeFactory, ITimerStateService timerStateService, ITimerStopService timerStopService)
+    public TodayViewModel(
+        IServiceScopeFactory scopeFactory,
+        ITimerStateService timerStateService,
+        ITimerStopService timerStopService,
+        ITimerSwitchService timerSwitchService)
     {
         _scopeFactory = scopeFactory;
         _timerStateService = timerStateService;
         _timerStopService = timerStopService;
+        _timerSwitchService = timerSwitchService;
         RemoveFromTodayCommand = new AsyncRelayCommand(p => RemoveFromTodayAsync((TaskDto)p!), p => p is TaskDto);
         StartTimerCommand = new AsyncRelayCommand(p => StartTimerAsync((TaskDto)p!), p => p is TaskDto);
-        StopTimerCommand = new AsyncRelayCommand(p => StopTimerAsync((TaskDto)p!), p => p is TaskDto);
+        StopTimerCommand = new AsyncRelayCommand(_ => StopTimerAsync(), p => p is TaskDto);
         CloseTaskCommand = new AsyncRelayCommand(p => CloseTaskAsync((TaskDto)p!), p => p is TaskDto);
+    }
+
+    public void Attach()
+    {
+        if (_attached) return;
+        _timerStateService.TimerStarted += OnTimerStateChanged;
+        _timerStateService.TimerStopped += OnTimerStateChanged;
+        _attached = true;
+    }
+
+    public void Detach()
+    {
+        if (!_attached) return;
+        _timerStateService.TimerStarted -= OnTimerStateChanged;
+        _timerStateService.TimerStopped -= OnTimerStateChanged;
+        _attached = false;
+    }
+
+    private async void OnTimerStateChanged(object? sender, EventArgs e)
+    {
+        try
+        {
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     public async Task LoadAsync()
@@ -58,57 +92,9 @@ public class TodayViewModel : ViewModelBase
         }
     }
 
-    private async Task StartTimerAsync(TaskDto task)
-    {
-        using var checkScope = _scopeFactory.CreateScope();
-        var recordRepo = checkScope.ServiceProvider.GetRequiredService<IRecordRepository>();
-        var activeRecord = await recordRepo.GetActiveAsync(CancellationToken.None);
+    private Task StartTimerAsync(TaskDto task) => _timerSwitchService.SwitchToAsync(task, confirm: true);
 
-        if (activeRecord is not null && activeRecord.TaskId != task.Id)
-        {
-            var activeTitle = Tasks.FirstOrDefault(t => t.Id == activeRecord.TaskId)?.Title
-                ?? $"task #{activeRecord.TaskId}";
-
-            var confirm = MessageBox.Show(
-                $"Timer is running for \"{activeTitle}\".\nStop it and start tracking \"{task.Title}\"?",
-                "Timer already running",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
-
-            if (confirm != MessageBoxResult.Yes) return;
-
-            var stopHandler = checkScope.ServiceProvider.GetRequiredService<ICommandHandler<StopTimerCommand, Unit>>();
-            try
-            {
-                await stopHandler.HandleAsync(new StopTimerCommand());
-                _timerStateService.NotifyTimerStopped();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-        }
-
-        using var scope = _scopeFactory.CreateScope();
-        var handler = scope.ServiceProvider.GetRequiredService<ICommandHandler<StartTimerCommand, int>>();
-        try
-        {
-            await handler.HandleAsync(new StartTimerCommand(task.Id));
-            _timerStateService.NotifyTimerStarted(task.Id, task.Title, task.SpentMinutes, task.PlannedMinutes, DateTime.Now, task.TfsWorkItemId);
-            await LoadAsync();
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
-    }
-
-    private async Task StopTimerAsync(TaskDto task)
-    {
-        if (await _timerStopService.SafeStopAsync())
-            await LoadAsync();
-    }
+    private Task StopTimerAsync() => _timerStopService.SafeStopAsync();
 
     private async Task CloseTaskAsync(TaskDto task)
     {

@@ -2,6 +2,8 @@ using HonestTimeTracker.Application;
 using HonestTimeTracker.Application.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Threading;
 
@@ -80,6 +82,52 @@ public partial class FloatingTimerWindow : Window
     {
         if (e.ButtonState == MouseButtonState.Pressed)
             DragMove();
+    }
+
+    private async void Border_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        e.Handled = true;
+        if (sender is not FrameworkElement target) return;
+
+        IReadOnlyList<SwitchTaskItem> items;
+        try
+        {
+            items = await _viewModel.LoadMenuTasksAsync();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var menu = BuildContextMenu(items);
+        menu.PlacementTarget = target;
+        menu.Placement = PlacementMode.MousePoint;
+        menu.IsOpen = true;
+    }
+
+    private ContextMenu BuildContextMenu(IReadOnlyList<SwitchTaskItem> items)
+    {
+        var menu = new ContextMenu();
+
+        foreach (var item in items)
+        {
+            menu.Items.Add(new MenuItem
+            {
+                Header = item.Header,
+                IsChecked = item.IsCurrent,
+                Command = _viewModel.SwitchTaskCommand,
+                CommandParameter = item.Task
+            });
+        }
+
+        if (items.All(i => i.IsCurrent))
+            menu.Items.Add(new MenuItem { Header = "No other tasks on today's list", IsEnabled = false });
+
+        menu.Items.Add(new Separator());
+        menu.Items.Add(new MenuItem { Header = "Stop timer", Command = _viewModel.StopTimerCommand });
+
+        return menu;
     }
 
     private async Task SavePositionAsync()

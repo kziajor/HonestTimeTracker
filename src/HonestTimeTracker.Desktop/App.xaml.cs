@@ -32,6 +32,7 @@ public partial class App : System.Windows.Application
         services.AddInfrastructure(dbPath);
         services.AddSingleton<ITimerStateService, TimerStateService>();
         services.AddSingleton<ITimerStopService, TimerStopService>();
+        services.AddSingleton<ITimerSwitchService, TimerSwitchService>();
         services.AddSingleton<FloatingTimerViewModel>();
         services.AddSingleton<FloatingTimerWindow>();
         services.AddSingleton<MainWindow>();
@@ -77,6 +78,7 @@ public partial class App : System.Windows.Application
 
     private static string GetDbPath()
     {
+        if (Environment.GetEnvironmentVariable("HTT_TEST_DB") is { } testDb) return testDb; // TEMP
         var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         return Path.Combine(appData, "HonestTimeTracker", "htt.db");
     }

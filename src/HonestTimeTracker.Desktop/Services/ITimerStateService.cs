@@ -20,7 +20,9 @@ public interface ITimerStateService
 {
     event EventHandler<TimerStartedEventArgs>? TimerStarted;
     event EventHandler? TimerStopped;
+    event EventHandler? RecordsChanged;
 
     void NotifyTimerStarted(int taskId, string taskTitle, int previousSpentMinutes, int plannedMinutes, DateTime startedAt, int? tfsWorkItemId = null);
     void NotifyTimerStopped();
+    void NotifyRecordsChanged();
 }
