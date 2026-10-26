@@ -14,7 +14,8 @@ public class GetTodayTasksQueryHandler(ITaskRepository repository, IRecordReposi
         return tasks
             .Select(t => new TaskDto(t.Id, t.TfsWorkItemId, t.Title, t.PlannedMinutes, t.SpentMinutes, t.Closed, t.ProjectId, t.Project?.Name,
                 HasActiveTimer: activeRecord?.TaskId == t.Id,
-                IsOnTodayList: true))
+                IsOnTodayList: true,
+                TfsCollectionId: t.TfsCollectionId))
             .ToList();
     }
 }

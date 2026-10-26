@@ -11,6 +11,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<TfsCollection> TfsCollections => Set<TfsCollection>();
     public DbSet<AppSettings> Settings => Set<AppSettings>();
     public DbSet<Leave> Leaves => Set<Leave>();
+    public DbSet<TfsImportPreference> TfsImportPreferences => Set<TfsImportPreference>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -22,6 +23,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<WorkRecord>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<TfsCollection>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<Leave>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<TfsImportPreference>().HasQueryFilter(e => !e.IsDeleted);
 
         modelBuilder.Entity<WorkRecord>()
             .HasOne(r => r.Task)
@@ -40,6 +42,23 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .WithMany(c => c.Projects)
             .HasForeignKey(p => p.TfsCollectionId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<WorkTask>()
+            .HasOne(t => t.TfsCollection)
+            .WithMany()
+            .HasForeignKey(t => t.TfsCollectionId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<TfsImportPreference>(e =>
+        {
+            e.ToTable("TfsImportPreferences");
+            e.Property(p => p.TfsProjectName).UseCollation("NOCASE");
+            e.HasIndex(p => new { p.TfsCollectionId, p.TfsProjectName }).IsUnique();
+            e.HasOne<TfsCollection>()
+                .WithMany()
+                .HasForeignKey(p => p.TfsCollectionId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
 
         modelBuilder.Entity<AppSettings>().HasData(
             new AppSettings { Id = 1, DbFilePath = string.Empty, DailyWorkHours = 8.0, DefaultTaskPlannedHours = null });

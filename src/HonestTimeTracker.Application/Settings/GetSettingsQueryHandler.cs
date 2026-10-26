@@ -7,6 +7,6 @@ public class GetSettingsQueryHandler(ISettingsRepository repository)
     {
         var settings = await repository.GetAsync(ct);
         return new SettingsDto(settings.DbFilePath, settings.DailyWorkHours, settings.DefaultTaskPlannedHours,
-            settings.ShowFloatingTimer, settings.FloatingTimerLeft, settings.FloatingTimerTop);
+            settings.ShowFloatingTimer, settings.FloatingTimerLeft, settings.FloatingTimerTop, settings.VerboseTfsLogging);
     }
 }

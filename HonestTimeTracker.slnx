@@ -5,4 +5,8 @@
     <Project Path="src/HonestTimeTracker.Domain/HonestTimeTracker.Domain.csproj" />
     <Project Path="src/HonestTimeTracker.Infrastructure/HonestTimeTracker.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/IntegrationTests/HonestTimeTracker.IntegrationTests.csproj" />
+    <Project Path="tests/UnitTests/HonestTimeTracker.UnitTests.csproj" />
+  </Folder>
 </Solution>

@@ -6,4 +6,5 @@ public record SettingsDto(
     double? DefaultTaskPlannedHours,
     bool ShowFloatingTimer,
     double? FloatingTimerLeft,
-    double? FloatingTimerTop);
+    double? FloatingTimerTop,
+    bool VerboseTfsLogging);

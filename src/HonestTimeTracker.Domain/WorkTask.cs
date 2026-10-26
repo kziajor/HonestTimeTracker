@@ -14,6 +14,8 @@ public class WorkTask
     public Project? Project { get; set; }
 
     public int? TfsWorkItemId { get; set; }
+    public int? TfsCollectionId { get; set; }
+    public TfsCollection? TfsCollection { get; set; }
 
     public ICollection<WorkRecord> Records { get; set; } = new List<WorkRecord>();
 

@@ -19,6 +19,8 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0"
@@ -72,12 +74,23 @@
                  BorderThickness="1"
                  Margin="0,0,0,16" />
 
-        <CheckBox Grid.Row="9"
+        <TextBlock Grid.Row="9" Text="TFS collection" Margin="0,0,0,6" />
+
+        <ComboBox Grid.Row="10"
+                  x:Name="TfsCollectionComboBox"
+                  Padding="8,6"
+                  FontSize="14"
+                  BorderBrush="#CCCCCC"
+                  BorderThickness="1"
+                  Margin="0,0,0,16"
+                  DisplayMemberPath="Name" />
+
+        <CheckBox Grid.Row="11"
                   x:Name="IsOnTodayListCheckBox"
                   Content="Show in Today"
                   Margin="0,0,0,20" />
 
-        <StackPanel Grid.Row="10" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="12" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Cancel"
                     Width="90"
                     Background="#E0E0E0"

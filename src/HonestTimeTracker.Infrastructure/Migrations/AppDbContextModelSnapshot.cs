@@ -42,6 +42,9 @@ namespace HonestTimeTracker.Infrastructure.Migrations
                     b.Property<bool>("ShowFloatingTimer")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("VerboseTfsLogging")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.ToTable("Settings");
@@ -52,7 +55,8 @@ namespace HonestTimeTracker.Infrastructure.Migrations
                             Id = 1,
                             DailyWorkHours = 8.0,
                             DbFilePath = "",
-                            ShowFloatingTimer = true
+                            ShowFloatingTimer = true,
+                            VerboseTfsLogging = false
                         });
                 });
 
@@ -114,6 +118,12 @@ namespace HonestTimeTracker.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("EncryptedPat")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
 
@@ -128,6 +138,34 @@ namespace HonestTimeTracker.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("TfsCollections");
+                });
+
+            modelBuilder.Entity("HonestTimeTracker.Domain.TfsImportPreference", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("LastProjectId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TfsCollectionId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TfsProjectName")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TfsCollectionId", "TfsProjectName")
+                        .IsUnique();
+
+                    b.ToTable("TfsImportPreferences", (string)null);
                 });
 
             modelBuilder.Entity("HonestTimeTracker.Domain.WorkRecord", b =>
@@ -188,6 +226,9 @@ namespace HonestTimeTracker.Infrastructure.Migrations
                     b.Property<int>("SpentMinutes")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("TfsCollectionId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int?>("TfsWorkItemId")
                         .HasColumnType("INTEGER");
 
@@ -198,6 +239,8 @@ namespace HonestTimeTracker.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ProjectId");
+
+                    b.HasIndex("TfsCollectionId");
 
                     b.ToTable("Tasks", (string)null);
                 });
@@ -210,6 +253,15 @@ namespace HonestTimeTracker.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("TfsCollection");
+                });
+
+            modelBuilder.Entity("HonestTimeTracker.Domain.TfsImportPreference", b =>
+                {
+                    b.HasOne("HonestTimeTracker.Domain.TfsCollection", null)
+                        .WithMany()
+                        .HasForeignKey("TfsCollectionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("HonestTimeTracker.Domain.WorkRecord", b =>
@@ -230,7 +282,14 @@ namespace HonestTimeTracker.Infrastructure.Migrations
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("HonestTimeTracker.Domain.TfsCollection", "TfsCollection")
+                        .WithMany()
+                        .HasForeignKey("TfsCollectionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("Project");
+
+                    b.Navigation("TfsCollection");
                 });
 
             modelBuilder.Entity("HonestTimeTracker.Domain.Project", b =>

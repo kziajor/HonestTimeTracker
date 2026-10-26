@@ -9,4 +9,5 @@ public class AppSettings
     public bool ShowFloatingTimer { get; set; } = true;
     public double? FloatingTimerLeft { get; set; }
     public double? FloatingTimerTop { get; set; }
+    public bool VerboseTfsLogging { get; set; }
 }

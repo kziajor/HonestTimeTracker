@@ -1,3 +1,5 @@
+using HonestTimeTracker.Application;
+using HonestTimeTracker.Application.Settings;
 using HonestTimeTracker.Desktop.Features.FloatingTimer;
 using HonestTimeTracker.Desktop.Features.Leaves;
 using HonestTimeTracker.Desktop.Features.Reports;
@@ -11,8 +13,11 @@ using HonestTimeTracker.Infrastructure;
 using HonestTimeTracker.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Serilog;
 using System.IO;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace HonestTimeTracker.Desktop;
 
@@ -24,11 +29,15 @@ public partial class App : System.Windows.Application
     {
         base.OnStartup(e);
 
+        Log.Logger = AppLogging.CreateLogger();
+        RegisterGlobalExceptionHandlers();
+        Log.Information("Application starting");
 
         var dbPath = GetDbPath();
         EnsureDbDirectory(dbPath);
 
         var services = new ServiceCollection();
+        services.AddLogging(builder => builder.SetMinimumLevel(LogLevel.Debug).AddSerilog(dispose: false));
         services.AddInfrastructure(dbPath);
         services.AddSingleton<ITimerStateService, TimerStateService>();
         services.AddSingleton<ITimerStopService, TimerStopService>();
@@ -54,6 +63,7 @@ public partial class App : System.Windows.Application
         Services = services.BuildServiceProvider();
 
         await MigrateDatabase();
+        await ApplyLoggingSettings();
 
         var mainWindow = Services.GetRequiredService<MainWindow>();
         MainWindow = mainWindow;
@@ -66,14 +76,44 @@ public partial class App : System.Windows.Application
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"[FloatingTimer] InitializeAsync failed: {ex}");
+            Log.Error(ex, "Floating timer initialization failed");
         }
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
         if (Services is IDisposable d) d.Dispose();
+        Log.Information("Application exiting");
+        Log.CloseAndFlush();
         base.OnExit(e);
+    }
+
+    private void RegisterGlobalExceptionHandlers()
+    {
+        DispatcherUnhandledException += OnDispatcherUnhandledException;
+        AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+            Log.Fatal(args.ExceptionObject as Exception, "Unhandled exception (terminating: {IsTerminating})", args.IsTerminating);
+        TaskScheduler.UnobservedTaskException += (_, args) =>
+        {
+            Log.Error(args.Exception, "Unobserved task exception");
+            args.SetObserved();
+        };
+    }
+
+    private static void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    {
+        Log.Error(e.Exception, "Unhandled UI exception");
+        MessageBox.Show($"An unexpected error occurred:\n{e.Exception.Message}\n\nDetails were written to the log.",
+            "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        e.Handled = true;
+    }
+
+    private static async Task ApplyLoggingSettings()
+    {
+        using var scope = Services.CreateScope();
+        var handler = scope.ServiceProvider.GetRequiredService<IQueryHandler<GetSettingsQuery, SettingsDto>>();
+        var settings = await handler.HandleAsync(new GetSettingsQuery());
+        AppLogging.SetVerboseTfsLogging(settings.VerboseTfsLogging);
     }
 
     private static string GetDbPath()

@@ -6,8 +6,11 @@ using HonestTimeTracker.Application.Projects;
 using HonestTimeTracker.Application.Records;
 using HonestTimeTracker.Application.Settings;
 using HonestTimeTracker.Application.Tasks;
+using HonestTimeTracker.Application.Tfs;
 using HonestTimeTracker.Infrastructure.Persistence;
 using HonestTimeTracker.Infrastructure.Repositories;
+using HonestTimeTracker.Infrastructure.Security;
+using HonestTimeTracker.Infrastructure.Tfs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -86,6 +89,34 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IQueryHandler<GetNormReportQuery, NormReportDto>, GetNormReportQueryHandler>();
         services.AddScoped<IQueryHandler<GetExportRecordsQuery, List<ExportRecordDto>>, GetExportRecordsQueryHandler>();
 
+        services.AddTfs();
+
+        return services;
+    }
+
+    private static IServiceCollection AddTfs(this IServiceCollection services)
+    {
+        services.AddSingleton<ISecretProtector, DpapiSecretProtector>();
+        services.AddTransient<TfsLoggingHandler>();
+        services.AddHttpClient<ITfsClient, TfsClient>(client => client.Timeout = TimeSpan.FromSeconds(30))
+            .AddHttpMessageHandler<TfsLoggingHandler>();
+
+        services.AddScoped<ITfsCollectionRepository, TfsCollectionRepository>();
+        services.AddScoped<ITfsSyncRepository, TfsSyncRepository>();
+
+        services.AddScoped<IValidator<CreateTfsCollectionCommand>, CreateTfsCollectionCommandValidator>();
+        services.AddScoped<IValidator<UpdateTfsCollectionCommand>, UpdateTfsCollectionCommandValidator>();
+        services.AddScoped<IValidator<DeleteTfsCollectionCommand>, DeleteTfsCollectionCommandValidator>();
+        services.AddScoped<IValidator<ImportTfsTasksCommand>, ImportTfsTasksCommandValidator>();
+
+        services.AddCommandHandler<CreateTfsCollectionCommand, CreateTfsCollectionCommandHandler, int>();
+        services.AddCommandHandler<UpdateTfsCollectionCommand, UpdateTfsCollectionCommandHandler, Unit>();
+        services.AddCommandHandler<DeleteTfsCollectionCommand, DeleteTfsCollectionCommandHandler, Unit>();
+        services.AddCommandHandler<ImportTfsTasksCommand, ImportTfsTasksCommandHandler, int>();
+        services.AddScoped<ICommandHandler<SyncWithTfsCommand, TfsSyncResult>, SyncWithTfsCommandHandler>();
+
+        services.AddScoped<IQueryHandler<GetTfsCollectionsQuery, List<TfsCollectionDto>>, GetTfsCollectionsQueryHandler>();
+        services.AddScoped<IQueryHandler<TestTfsConnectionQuery, string>, TestTfsConnectionQueryHandler>();
         return services;
     }
 

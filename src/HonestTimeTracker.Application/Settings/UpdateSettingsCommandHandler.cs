@@ -9,6 +9,7 @@ public class UpdateSettingsCommandHandler(ISettingsRepository repository)
         settings.DailyWorkHours = command.DailyWorkHours;
         settings.DefaultTaskPlannedHours = command.DefaultTaskPlannedHours;
         settings.ShowFloatingTimer = command.ShowFloatingTimer;
+        settings.VerboseTfsLogging = command.VerboseTfsLogging;
         await repository.SaveChangesAsync(ct);
         return Unit.Value;
     }

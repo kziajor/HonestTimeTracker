@@ -16,6 +16,28 @@
                     DockPanel.Dock="Right"
                     Padding="16,8"
                     Command="{Binding AddCommand}" />
+            <Button Content="Sync with TFS"
+                    DockPanel.Dock="Right"
+                    Padding="16,8"
+                    Margin="0,0,8,0"
+                    Background="#E0E0E0"
+                    Foreground="Black"
+                    ToolTip="Close tasks finished in TFS and import new work items assigned to you"
+                    Command="{Binding SyncWithTfsCommand}" />
+            <Button Content="Cancel"
+                    DockPanel.Dock="Right"
+                    Padding="12,8"
+                    Margin="0,0,8,0"
+                    Background="#E0E0E0"
+                    Foreground="Black"
+                    Command="{Binding CancelSyncCommand}"
+                    Visibility="{Binding IsSyncing, Converter={StaticResource BoolToVisibility}}" />
+            <TextBlock Text="{Binding SyncStatus}"
+                       DockPanel.Dock="Right"
+                       VerticalAlignment="Center"
+                       Foreground="#555555"
+                       Margin="0,0,12,0"
+                       Visibility="{Binding IsSyncing, Converter={StaticResource BoolToVisibility}}" />
         </DockPanel>
 
         <!-- Filter row -->

@@ -1,4 +1,5 @@
 using HonestTimeTracker.Application.Projects;
+using HonestTimeTracker.Application.Tfs;
 using System.Windows;
 using System.Windows.Input;
 
@@ -6,15 +7,24 @@ namespace HonestTimeTracker.Desktop.Features.Tasks;
 
 public partial class TaskDialog : Window
 {
+    private sealed record CollectionOption(int? Id, string Name);
+
     public string TaskTitle => TitleBox.Text.Trim();
     public int PlannedMinutes { get; private set; }
     public int ProjectId => ((ProjectDto)ProjectComboBox.SelectedItem).Id;
     public int? TfsWorkItemId { get; private set; }
     public bool IsOnTodayList => IsOnTodayListCheckBox.IsChecked == true;
+    /// Null means "auto-detect" — the collection is resolved during TFS sync.
+    public int? TfsCollectionId => (TfsCollectionComboBox.SelectedItem as CollectionOption)?.Id;
 
-    public TaskDialog(IEnumerable<ProjectDto> projects, string? existingTitle = null, int existingPlannedMinutes = 0, int? existingProjectId = null, double? defaultPlannedHours = null, int? existingTfsWorkItemId = null, bool existingIsOnTodayList = false)
+    public TaskDialog(IEnumerable<ProjectDto> projects, string? existingTitle = null, int existingPlannedMinutes = 0, int? existingProjectId = null, double? defaultPlannedHours = null, int? existingTfsWorkItemId = null, bool existingIsOnTodayList = false, IEnumerable<TfsCollectionDto>? tfsCollections = null, int? existingTfsCollectionId = null)
     {
         InitializeComponent();
+
+        var collectionOptions = new List<CollectionOption> { new(null, "(auto-detect)") };
+        collectionOptions.AddRange((tfsCollections ?? []).Select(c => new CollectionOption(c.Id, c.Enabled ? c.Name : $"{c.Name} (disabled)")));
+        TfsCollectionComboBox.ItemsSource = collectionOptions;
+        TfsCollectionComboBox.SelectedItem = collectionOptions.Find(c => c.Id == existingTfsCollectionId) ?? collectionOptions[0];
 
         var list = projects.ToList();
         ProjectComboBox.ItemsSource = list;
